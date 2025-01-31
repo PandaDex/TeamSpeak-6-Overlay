@@ -14,6 +14,7 @@ Simple screen overlay that shows speaking users from the current channel in the 
 2. Run the installer.
 3. After installation, accept the connection request in the TeamSpeak client. <br>
    ![Accept-Connection](./markdown/accept.png)
+4. Create shortcut to main executable and put it in `shell:startup` folder. (Optional)
 
 ## Future Plans
 
