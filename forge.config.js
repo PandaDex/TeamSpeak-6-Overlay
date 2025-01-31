@@ -26,6 +26,18 @@ module.exports = {
       config: {},
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'PandaDex',
+          name: 'TeamSpeak-6-Overlay'
+        },
+        prerelease: false
+      }
+    }
+  ],
   plugins: [
     {
       name: '@electron-forge/plugin-vite',
