@@ -22,6 +22,7 @@ Simple screen overlay that shows speaking users from the current channel in the 
 - Overlay position change.
 - Overlay transparency.
 - Add a way to start the overlay automatically with the TeamSpeak client.
+- Linux And MacOS(maybe) Support.
 
 ## Issues and Feature Requests
 
