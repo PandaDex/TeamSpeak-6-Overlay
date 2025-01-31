@@ -2,7 +2,7 @@
   "name": "teamspeak-overlay",
   "productName": "teamspeak-overlay",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Simple teamspeak 6 overlay",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
