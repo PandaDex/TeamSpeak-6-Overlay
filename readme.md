@@ -2,6 +2,9 @@
 
 Simple screen overlay that shows speaking users from the current channel in the upper left corner of the screen (customization coming soon).
 
+## Upcoming update 
+Due to errors on linux upcoming update will take longer than expected.
+
 ## Compatibility
 
 ```
