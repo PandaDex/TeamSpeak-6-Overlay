@@ -1,16 +1,22 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
-const path = require('node:path');
 
 module.exports = {
   packagerConfig: {
     asar: false,
+    setupIcon: "./public/icons/icon@1x",
+    icon: "./public/icons/icon@1x",
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
+        iconUrl: 'https://i.imgur.com/nf8OVyI.png',
+        setupIcon: "./public/icons/icon@1x.ico",
+        setupExe: "TeamSpeak-Overlay-Setup.exe",
+        arch: "x64",
+        platform: "win32"
       },
     },
     {

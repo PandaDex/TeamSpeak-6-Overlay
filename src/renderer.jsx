@@ -31,5 +31,14 @@ import "./index.css";
 import { createRoot } from "react-dom/client";
 import React from "react";
 import View from "./pages/View";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Settings from "./pages/Settings";
 
-createRoot(document.getElementById("root")).render(<View />);
+createRoot(document.getElementById("root")).render(
+	<Router>
+		<Routes>
+			<Route path="/" element={<View />} />
+			<Route path="/settings" element={<Settings />} />
+		</Routes>
+	</Router>,
+);
