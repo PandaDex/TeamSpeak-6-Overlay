@@ -4,13 +4,13 @@ Simple screen overlay that shows speaking users from the current channel in the 
 
 ## Upcoming update
 
-Due to errors on linux upcoming update will take longer than expected.
+You can test new update by downloading pre-release version from [releases](https://github.com/PandaDex/TeamSpeak-6-Overlay/releases)
 
 ## Compatibility
 
-```
-⚠️ Supports only windowed and fullscreen borderless applications, won't work with exclusive fullscreen applications.
-```
+- Supports only windowed and fullscreen borderless applications, won’t work with exclusive fullscreen applications.
+- Shouldn’t interfere with any anti-cheat software but i can’t guarantee anything.
+- Currently it supports Windows, but I’m in the making of a new release that will support Linux.
 
 ## Installation
 
