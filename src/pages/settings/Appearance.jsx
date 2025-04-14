@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 export default function AppearanceTab({ currentConfig, setCurrentConfig }) {
 	return (
-		<div className="w-full h-full flex flex-col gap-4">
+		<div className="w-full h-full flex flex-col  gap-4">
 			<div>
 				<h2 className="font-semibold text-lg">Overlay Position</h2>
 				<p className="text-sm text-zinc-400">

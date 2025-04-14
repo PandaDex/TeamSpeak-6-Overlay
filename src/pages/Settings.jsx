@@ -37,34 +37,6 @@ function Settings() {
 			<p className="text-sm text-zinc-400">
 				Customize overlay any way you want!
 			</p>
-			{JSON.stringify(startConfig) !== JSON.stringify(currentConfig) && (
-				<div className="w-full absolute z-50 left-0 bottom-10 flex items-center justify-center">
-					<div className="w-3/4 bg-zinc-950 border  rounded-lg flex items-center justify-between px-2 py-2">
-						<p className="text-base font-medium">
-							Relaunch is required to apply changes!
-						</p>
-						<div className="grow" />
-						<Button
-							size="sm"
-							className="mr-2"
-							onClick={() => {
-								setCurrentConfig(startConfig);
-							}}
-							variant="secondary"
-						>
-							Restore Previous
-						</Button>
-						<Button
-							size="sm"
-							onClick={() => {
-								ipcRenderer.send("save-config", currentConfig);
-							}}
-						>
-							Save And Restart
-						</Button>
-					</div>
-				</div>
-			)}
 			<div className="grow h-[1px] my-5 rounded-full bg-zinc-800" />
 			<div className="w-full h-full flex">
 				<aside className="w-1/5 h-full flex flex-col gap-1">
@@ -86,36 +58,6 @@ function Settings() {
 					>
 						System
 					</Button>
-					{/* <Button
-						variant="ghost"
-						className={`justify-start ${
-							activeTab === "notifications" ? "bg-zinc-900" : ""
-						}`}
-						onClick={() => setActiveTab("notifications")}
-						disabled
-					>
-						Notifications
-					</Button>
-					<Button
-						variant="ghost"
-						className={`justify-start ${
-							activeTab === "keybinds" ? "bg-zinc-900" : ""
-						}`}
-						disabled
-						onClick={() => setActiveTab("keybinds")}
-					>
-						Keybinds
-					</Button>
-					<Button
-						variant="ghost"
-						className={`justify-start ${
-							activeTab === "linux" ? "bg-zinc-900" : ""
-						}`}
-						disabled
-						onClick={() => setActiveTab("linux")}
-					>
-						Linux Specific
-					</Button> */}
 					<Button
 						variant="ghost"
 						className={`justify-start ${
@@ -126,11 +68,39 @@ function Settings() {
 						About
 					</Button>
 				</aside>
-				<main className="w-4/5 h-full flex flex-col pl-6">
-					<TabRouter
-						tab={activeTab}
-						{...{ currentConfig, setCurrentConfig, version }}
-					/>
+				<main className="w-4/5 flex flex-col pl-6 min-h-0">
+					<div className="flex-1 overflow-y-auto">
+						<TabRouter
+							tab={activeTab}
+							{...{ currentConfig, setCurrentConfig, version }}
+						/>
+					</div>
+					{JSON.stringify(startConfig) !== JSON.stringify(currentConfig) && (
+						<div className="w-full bg-zinc-950 border rounded-lg flex items-center justify-between px-2 py-2 mt-2">
+							<p className="text-base font-medium">
+								Relaunch is required to apply changes!
+							</p>
+							<div className="grow" />
+							<Button
+								size="sm"
+								className="mr-2"
+								onClick={() => {
+									setCurrentConfig(startConfig);
+								}}
+								variant="secondary"
+							>
+								Restore Previous
+							</Button>
+							<Button
+								size="sm"
+								onClick={() => {
+									ipcRenderer.send("save-config", currentConfig);
+								}}
+							>
+								Save And Restart
+							</Button>
+						</div>
+					)}
 				</main>
 			</div>
 		</div>
