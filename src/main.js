@@ -5,8 +5,6 @@ import os from 'node:os';
 import started from 'electron-squirrel-startup';
 import AutoLaunch from 'auto-launch';
 
-// Constants
-const CONFIG_PATH = path.join(os.homedir(), 'AppData/Roaming/teamspeak-overlay/config.json');
 const DEFAULT_CONFIG = {
   position: 'tl',
   padding: 10,
@@ -14,19 +12,21 @@ const DEFAULT_CONFIG = {
   opacity: 100,
 };
 
-// Global variables
 let mainWindow = null;
 let settingsWindow = null;
 let tray = null;
 let config = DEFAULT_CONFIG;
+let CONFIG_PATH = path.join(os.homedir(), 'AppData/Roaming/teamspeak-overlay/config.json');
 let _icon = null;
 
-// Exit if another instance is running
+if (os.platform() !== "win32") {
+  CONFIG_PATH = path.join(os.homedir(), '.config/teamspeak-overlay/config.json');
+}
+
 if (started) {
   app.quit();
 }
 
-// Load or create config file
 function initializeConfig() {
   try {
     if (fs.existsSync(CONFIG_PATH)) {
@@ -37,6 +37,7 @@ function initializeConfig() {
     }
   } catch (error) {
     console.error('Failed to initialize config:', error);
+    app.quit();
   }
 }
 
@@ -46,7 +47,7 @@ ipcMain.on('get-config', (event) => {
 });
 
 ipcMain.on('get-version', (event) => {
-  event.reply('version', app.getVersion());
+  event.reply('version', `${app.getVersion()}-${os.platform()}`);
 });
 
 ipcMain.on('save-config', (_, newConfig) => {
@@ -199,7 +200,6 @@ function createTray(icon) {
   tray.setToolTip('Teamspeak Overlay');
 }
 
-// App event handlers
 app.whenReady().then(() => {
   initializeConfig();
   createMainWindow();

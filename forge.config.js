@@ -15,22 +15,28 @@ module.exports = {
         iconUrl: 'https://i.imgur.com/nf8OVyI.png',
         setupIcon: "./public/icons/icon@1x.ico",
         setupExe: "TeamSpeak-Overlay-Setup.exe",
-        arch: "x64",
-        platform: "win32"
+        authors: "PandaDex",
+        description: "Simple TeamSpeak 6 Overlay"
       },
     },
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
-    },
-    {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          maintainer: 'PandaDex',
+          homepage: 'https://github.com/PandaDex/TeamSpeak-6-Overlay',
+          icon: './public/icons/icon@1x.png'
+        }
+      },
     },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
+    // {
+    //   name: '@electron-forge/maker-zip',
+    //   platforms: ['darwin'],
+    // },
+    // {
+    //   name: '@electron-forge/maker-deb',
+    //   config: {},
+    // }
   ],
   publishers: [
     {
