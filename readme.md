@@ -4,7 +4,7 @@
 
 # Sorry for low activity
 
-Hey, sorry for not being very active on this project, this is a side project for me as i have 2 major projects in the making and work in meantime. I will continue to maintain this repo but expect commits only every few days.
+Hey, sorry for not being very active on this project, this is a side project for me as i have 2 major projects in the making and job in meantime. I will continue to maintain this repo but expect commits only every few days.
 
 ## Upcoming update
 
