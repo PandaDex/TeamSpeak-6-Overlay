@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SpeakingClient from "../components/SpeakingClient";
 import { Toaster, toast } from "sonner";
 import JoiningClient from "../components/JoiningClient";
+import { log } from "@/lib/logger";
 
 function View() {
 	const [speakingClients, setSpeakingClients] = useState([]);
@@ -31,17 +32,7 @@ function View() {
 				},
 			};
 			ws.send(JSON.stringify(payload));
-
-			toast.success("Connected", {
-				richColors: true,
-				duration: 2000,
-				position: query.get("y") ? "bottom-center" : "top-center",
-				style: {
-					backgroundColor: "oklch(.141 .005 285.823)",
-					borderColor: "oklch(.21 .006 285.885)",
-					width: "150px",
-				},
-			});
+			log("Connected to WebSocket server");
 		};
 
 		ws.onmessage = (message) => {
@@ -54,6 +45,17 @@ function View() {
 						nickname: client.properties.nickname,
 						avatar: client.properties.myteamspeakAvatar.replace("2,", ""),
 					}));
+
+					toast.success("Connected", {
+						richColors: true,
+						duration: 2000,
+						position: query.get("y") ? "bottom-center" : "top-center",
+						style: {
+							backgroundColor: "oklch(.141 .005 285.823)",
+							borderColor: "oklch(.21 .006 285.885)",
+							width: "150px",
+						},
+					});
 
 					localStorage.setItem("api_key", data.payload.apiKey);
 					currentId = data.payload.connections[0].clientId;

@@ -4,8 +4,8 @@
     "rsc": false,
     "tsx": false,
     "tailwind": {
-        "config": "src/tailwind.config.js",
-        "css": "src/index.css",
+        "config": "src/frontend/tailwind.config.js",
+        "css": "src/frontend/index.css",
         "baseColor": "zinc",
         "cssVariables": false,
         "prefix": ""

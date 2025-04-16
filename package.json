@@ -6,7 +6,7 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
-    "package": "electron-forge package",
+    "dev": "vite --config vite.renderer.config.mjs src/frontend",
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32 --targets @electron-forge/maker-squirrel",
     "make:deb": "electron-forge make --platform linux --targets @electron-forge/maker-deb",
