@@ -1,6 +1,13 @@
-#include "websocketmanager.h"
+#include "WebSocketManager.h"
 #include <QDebug>
 #include <QDateTime>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QPixmap>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QUrl>
 
 WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
     : QObject(parent), overlay(overlayParent)
@@ -18,7 +25,15 @@ void WebSocketManager::onConnected()
 {
     qDebug() << "WebSocket connected";
     QJsonObject payload, content;
-    content["apiKey"] = "";
+
+    QString apiKey = getApiKey();
+    if (!apiKey.isEmpty()) {
+        content["apiKey"] = apiKey;
+    } else {
+        content["apiKey"] = "";
+        qDebug() << "No API key available for authentication";
+    }
+
     payload["type"] = "auth";
     QJsonObject details;
     details["identifier"] = "dex.teamspeak6.overlay";
@@ -47,6 +62,12 @@ void WebSocketManager::onTextMessageReceived(QString message)
         currentChannel = payload["connections"].toArray()[0].toObject()["clientInfos"].toArray()
                              .first().toObject()["channelId"].toString().toInt();
 
+        if(!payload["apiKey"].toString().isEmpty()) {
+            saveApiKey(payload["apiKey"].toString());
+        }
+
+        qDebug() << payload;
+
         for (const QJsonValue &val : infos) {
             QJsonObject obj = val.toObject();
             ClientInfo info;
@@ -73,11 +94,48 @@ void WebSocketManager::onTextMessageReceived(QString message)
 void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
     if (!bubbles.contains(client.id)) {
-        QPixmap avatarPixmap(QString(":/avatars/%1.png").arg(client.avatarUrl));
-        UserBubble *bubble = new UserBubble(client.nickname, avatarPixmap, overlay);
-        bubble->move(10, 10 + bubbles.size() * 40);
-        bubble->show();
-        bubbles[client.id] = bubble;
+        QString avatarUrl = client.avatarUrl;
+
+        if (avatarUrl.isEmpty()) {
+            qDebug() << "No avatar URL for client:" << client.nickname;
+            return;
+        }
+
+        if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
+            avatarUrl = "https://" + avatarUrl;
+        }
+
+        QUrl url(avatarUrl);
+        if (!url.isValid()) {
+            qDebug() << "Invalid avatar URL:" << avatarUrl;
+            return;
+        }
+
+        QNetworkRequest request(url);
+        QNetworkReply* reply = networkManager.get(request);
+
+        connect(reply, &QNetworkReply::finished, this, [=]() {
+            if (reply->error() != QNetworkReply::NoError) {
+                qDebug() << "Failed to load avatar from:" << avatarUrl << "Error:" << reply->errorString();
+                reply->deleteLater();
+                return;
+            }
+
+            QByteArray data = reply->readAll();
+            QPixmap avatar;
+            if (!avatar.loadFromData(data)) {
+                qDebug() << "Failed to load avatar image data for:" << client.nickname;
+                reply->deleteLater();
+                return;
+            }
+
+            UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
+            bubble->move(10, 10 + bubbles.size() * 40);
+            bubble->show();
+            bubbles[client.id] = bubble;
+
+            reply->deleteLater();
+        });
     }
 }
 
@@ -88,3 +146,52 @@ void WebSocketManager::removeSpeakingClient(const QString &clientId)
         bubbles.remove(clientId);
     }
 }
+
+void WebSocketManager::saveApiKey(const QString &apiKey)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("config.db");
+
+    if (!db.open()) {
+        qDebug() << "Failed to open database";
+        return;
+    }
+
+    QSqlQuery query;
+    query.prepare("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT)");
+    if (!query.exec()) {
+        qDebug() << "Failed to create table:" << query.lastError().text();
+        return;
+    }
+
+    query.prepare("INSERT INTO data (key) VALUES (:key)");
+    query.bindValue(":key", apiKey);
+    if (!query.exec()) {
+        qDebug() << "Failed to insert API key:" << query.lastError().text();
+    }
+
+    db.close();
+}
+
+QString WebSocketManager::getApiKey()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("config.db");
+
+    if (!db.open()) {
+        qDebug() << "Failed to open database";
+        return QString();
+    }
+
+    QSqlQuery query("SELECT key FROM data ORDER BY id DESC LIMIT 1");
+    QString apiKey;
+    if (query.next()) {
+        apiKey = query.value(0).toString();
+    } else {
+        qDebug() << "No API key found";
+    }
+
+    db.close();
+    return apiKey;
+}
+

@@ -7,6 +7,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
 #include "userbubble.h"
 
 struct ClientInfo {
@@ -33,6 +38,10 @@ private:
     int currentChannel = -1;
     QWidget *overlay;
     QMap<QString, UserBubble*> bubbles;
+    QNetworkAccessManager networkManager;
+
+    void saveApiKey(const QString &apiKey);
+    QString getApiKey();
 
     void showSpeakingClient(const ClientInfo &client);
     void removeSpeakingClient(const QString &clientId);
