@@ -22,13 +22,17 @@ set(PROJECT_SOURCES
         ${TS_FILES}
 )
 
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(TeamSpeak-Overlay
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         userbubble.h userbubble.cpp
         websocketmanager.h websocketmanager.cpp
-
+        resources.qrc
+        resources.rc
+        ${app_icon_resource_windows}
 
     )
 # Define target properties for Android with Qt 6 as:
