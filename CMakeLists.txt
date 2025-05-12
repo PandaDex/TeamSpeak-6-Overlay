@@ -15,10 +15,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Net
 set(TS_FILES TeamSpeak-Overlay_pl_PL.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        overlaywindow.cpp
-        overlaywindow.h
-        overlaywindow.ui
+        src/main.cpp
+        src/overlaywindow.cpp
+        src/overlaywindow.h
+        src/overlaywindow.ui
         ${TS_FILES}
 )
 
@@ -28,8 +28,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(TeamSpeak-Overlay
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        userbubble.h userbubble.cpp
-        websocketmanager.h websocketmanager.cpp
+        src/userbubble.h src/userbubble.cpp
+        src/websocketmanager.h src/websocketmanager.cpp
         resources.qrc
         resources.rc
         ${app_icon_resource_windows}
@@ -63,7 +63,7 @@ target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Q
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.TeamSpeak-Overlay)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.dex.TeamSpeak-Overlay)
 endif()
 set_target_properties(TeamSpeak-Overlay PROPERTIES
     ${BUNDLE_ID_OPTION}
