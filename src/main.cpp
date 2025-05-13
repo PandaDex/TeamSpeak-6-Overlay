@@ -1,5 +1,6 @@
 #include "overlaywindow.h"
 #include "databasemanager.h"
+#include "settingswindow.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -12,7 +13,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
+    QApplication::setQuitOnLastWindowClosed(false);
     // Initialize database
     DatabaseManager::initialize();
 
@@ -40,7 +41,11 @@ int main(int argc, char *argv[])
     QMenu *trayMenu = new QMenu;
 
     QAction *settingsAction = new QAction("Settings", trayMenu);
-    settingsAction->setDisabled(true);
+    QObject::connect(settingsAction, &QAction::triggered, [&]() {
+        SettingsWindow *settings = new SettingsWindow;
+        settings->setAttribute(Qt::WA_DeleteOnClose);
+        settings->show();
+    });
 
     QAction *quitAction = new QAction("Quit", trayMenu);
     QObject::connect(quitAction, &QAction::triggered, &a, &QApplication::quit);
@@ -50,12 +55,12 @@ int main(int argc, char *argv[])
     trayIcon->setContextMenu(trayMenu);
     trayIcon->show();
 
-    QString VAR_CONFIG_POSITION = "tl";
+    int VAR_CONFIG_POSITION = 0;
     int VAR_CONFIG_PADDING = 10;
     int VAR_CONFIG_OPACITY = 100;
 
     if(!DatabaseManager::get("overlayPosition").isEmpty()){
-        VAR_CONFIG_POSITION = DatabaseManager::get("overlayPosition");
+        VAR_CONFIG_POSITION = DatabaseManager::get("overlayPosition").toInt();
     }
 
     if(!DatabaseManager::get("overlayPadding").isEmpty()){
@@ -71,13 +76,13 @@ int main(int argc, char *argv[])
     int windowWidth = w.width();
     int windowHeight = w.height();
 
-    if (VAR_CONFIG_POSITION == "tr") {
+    if (VAR_CONFIG_POSITION == 1) {
         w.move(screenGeometry.right() - windowWidth - VAR_CONFIG_PADDING,
                screenGeometry.top() + VAR_CONFIG_PADDING);
-    } else if (VAR_CONFIG_POSITION == "bl") {
+    } else if (VAR_CONFIG_POSITION == 2) {
         w.move(screenGeometry.left() + VAR_CONFIG_PADDING,
                screenGeometry.bottom() - windowHeight - VAR_CONFIG_PADDING);
-    } else if (VAR_CONFIG_POSITION == "br") {
+    } else if (VAR_CONFIG_POSITION == 3) {
         w.move(screenGeometry.right() - windowWidth - VAR_CONFIG_PADDING,
                screenGeometry.bottom() - windowHeight - VAR_CONFIG_PADDING);
     } else {
@@ -97,3 +102,4 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+
