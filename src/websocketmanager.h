@@ -23,6 +23,8 @@ class WebSocketManager : public QObject {
 public:
     explicit WebSocketManager(QWidget *overlayParent, QObject *parent = nullptr);
     void connectToServer();
+    bool ALG_RIGHT;
+    bool ALG_BOTTOM;
 
 private slots:
     void onConnected();

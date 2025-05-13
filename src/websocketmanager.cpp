@@ -20,6 +20,28 @@ WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
 void WebSocketManager::connectToServer()
 {
     socket.open(QUrl("ws://localhost:5899/"));
+    switch(DatabaseManager::get("overlayPosition").toInt()) {
+    case 0:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    case 1:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =true;
+        break;
+    case 2:
+        WebSocketManager::ALG_BOTTOM =true;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    case 3:
+        WebSocketManager::ALG_BOTTOM =true;
+        WebSocketManager::ALG_RIGHT =true;
+        break;
+    default:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    }
 }
 
 void WebSocketManager::onConnected()
@@ -131,7 +153,20 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
             }
 
             UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
-            bubble->move(10, 10 + bubbles.size() * 40);
+            bubble->adjustSize();
+
+            int x = 10;
+            int y = 10 + bubbles.size() * 40;
+
+            if (WebSocketManager::ALG_RIGHT) {
+                x = overlay->width() - bubble->width() - 10;
+            }
+
+            if (WebSocketManager::ALG_BOTTOM) {
+                y = overlay->height() - bubble->height() - 10 - bubbles.size() * 40;
+            }
+
+            bubble->move(x, y);
             bubble->show();
             bubbles[client.id] = bubble;
 

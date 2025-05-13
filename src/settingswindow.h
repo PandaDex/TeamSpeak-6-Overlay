@@ -2,6 +2,7 @@
 #define SETTINGSWINDOW_H
 
 #include <QWidget>
+#include <QShowEvent>
 
 namespace Ui {
 class SettingsWindow;
@@ -15,8 +16,12 @@ public:
     explicit SettingsWindow(QWidget *parent = nullptr);
     ~SettingsWindow();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private:
     void OnSaveButtonClicked();
+    void loadSettings();
     Ui::SettingsWindow *ui;
 };
 
