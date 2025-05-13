@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resources.qrc
         resources.rc
         ${app_icon_resource_windows}
+        src/databasemanager.h src/databasemanager.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

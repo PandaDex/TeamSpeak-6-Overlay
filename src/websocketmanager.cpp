@@ -1,4 +1,5 @@
 #include "WebSocketManager.h"
+#include "databasemanager.h"
 #include <QDebug>
 #include <QDateTime>
 #include <QNetworkRequest>
@@ -26,7 +27,7 @@ void WebSocketManager::onConnected()
     qDebug() << "WebSocket connected";
     QJsonObject payload, content;
 
-    QString apiKey = getApiKey();
+    QString apiKey = DatabaseManager::get("apiKey");
     if (!apiKey.isEmpty()) {
         content["apiKey"] = apiKey;
     } else {
@@ -63,7 +64,7 @@ void WebSocketManager::onTextMessageReceived(QString message)
                              .first().toObject()["channelId"].toString().toInt();
 
         if(!payload["apiKey"].toString().isEmpty()) {
-            saveApiKey(payload["apiKey"].toString());
+            DatabaseManager::set("apiKey", payload["apiKey"].toString());
         }
 
         qDebug() << payload;
@@ -146,52 +147,3 @@ void WebSocketManager::removeSpeakingClient(const QString &clientId)
         bubbles.remove(clientId);
     }
 }
-
-void WebSocketManager::saveApiKey(const QString &apiKey)
-{
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("config.db");
-
-    if (!db.open()) {
-        qDebug() << "Failed to open database";
-        return;
-    }
-
-    QSqlQuery query;
-    query.prepare("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT)");
-    if (!query.exec()) {
-        qDebug() << "Failed to create table:" << query.lastError().text();
-        return;
-    }
-
-    query.prepare("INSERT INTO data (key) VALUES (:key)");
-    query.bindValue(":key", apiKey);
-    if (!query.exec()) {
-        qDebug() << "Failed to insert API key:" << query.lastError().text();
-    }
-
-    db.close();
-}
-
-QString WebSocketManager::getApiKey()
-{
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("config.db");
-
-    if (!db.open()) {
-        qDebug() << "Failed to open database";
-        return QString();
-    }
-
-    QSqlQuery query("SELECT key FROM data ORDER BY id DESC LIMIT 1");
-    QString apiKey;
-    if (query.next()) {
-        apiKey = query.value(0).toString();
-    } else {
-        qDebug() << "No API key found";
-    }
-
-    db.close();
-    return apiKey;
-}
-

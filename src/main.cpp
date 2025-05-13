@@ -1,4 +1,5 @@
 #include "overlaywindow.h"
+#include "databasemanager.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -11,6 +12,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // Initialize database
+    DatabaseManager::initialize();
 
     // Load translations
     QTranslator translator;
@@ -46,8 +50,49 @@ int main(int argc, char *argv[])
     trayIcon->setContextMenu(trayMenu);
     trayIcon->show();
 
+    QString VAR_CONFIG_POSITION = "tl";
+    int VAR_CONFIG_PADDING = 10;
+    int VAR_CONFIG_OPACITY = 100;
+
+    if(!DatabaseManager::get("overlayPosition").isEmpty()){
+        VAR_CONFIG_POSITION = DatabaseManager::get("overlayPosition");
+    }
+
+    if(!DatabaseManager::get("overlayPadding").isEmpty()){
+        VAR_CONFIG_PADDING = DatabaseManager::get("overlayPadding").toInt();
+    }
+
+    if(!DatabaseManager::get("overlayOpacity").isEmpty()){
+        VAR_CONFIG_OPACITY = DatabaseManager::get("overlayOpacity").toInt();
+    }
+
     OverlayWindow w;
-    w.move(10, 10);
+    QRect screenGeometry = QApplication::primaryScreen()->availableGeometry();
+    int windowWidth = w.width();
+    int windowHeight = w.height();
+
+    if (VAR_CONFIG_POSITION == "tr") {
+        w.move(screenGeometry.right() - windowWidth - VAR_CONFIG_PADDING,
+               screenGeometry.top() + VAR_CONFIG_PADDING);
+    } else if (VAR_CONFIG_POSITION == "bl") {
+        w.move(screenGeometry.left() + VAR_CONFIG_PADDING,
+               screenGeometry.bottom() - windowHeight - VAR_CONFIG_PADDING);
+    } else if (VAR_CONFIG_POSITION == "br") {
+        w.move(screenGeometry.right() - windowWidth - VAR_CONFIG_PADDING,
+               screenGeometry.bottom() - windowHeight - VAR_CONFIG_PADDING);
+    } else {
+        w.move(screenGeometry.left() + VAR_CONFIG_PADDING,
+               screenGeometry.top() + VAR_CONFIG_PADDING);
+    }
+
+    w.setWindowOpacity(VAR_CONFIG_OPACITY/100.0);
+
+    qDebug() << "==CONFIG==";
+    qDebug() << VAR_CONFIG_POSITION;
+    qDebug() << VAR_CONFIG_PADDING;
+    qDebug() << VAR_CONFIG_OPACITY;
+    qDebug() << "==========";
+
     w.show();
 
     return a.exec();
