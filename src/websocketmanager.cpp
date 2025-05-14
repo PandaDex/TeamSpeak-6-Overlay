@@ -19,30 +19,19 @@ WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
 
 void WebSocketManager::connectToServer()
 {
+    connect(&socket, &QWebSocket::errorOccurred, this, [this](QAbstractSocket::SocketError error){
+        qDebug() << "WebSocket error:" << socket.errorString();
+
+        if(socket.errorString() == "The remote host closed the connection") {
+            DatabaseManager::set("apiKey", "");
+            connectToServer();
+        }
+    });
+
     socket.open(QUrl("ws://localhost:5899/"));
-    switch(DatabaseManager::get("overlayPosition").toInt()) {
-    case 0:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
-    case 1:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =true;
-        break;
-    case 2:
-        WebSocketManager::ALG_BOTTOM =true;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
-    case 3:
-        WebSocketManager::ALG_BOTTOM =true;
-        WebSocketManager::ALG_RIGHT =true;
-        break;
-    default:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
-    }
 }
+
+
 
 void WebSocketManager::onConnected()
 {
@@ -67,6 +56,29 @@ void WebSocketManager::onConnected()
     payload["payload"] = details;
 
     socket.sendTextMessage(QJsonDocument(payload).toJson(QJsonDocument::Compact));
+
+    switch(DatabaseManager::get("overlayPosition").toInt()) {
+    case 0:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    case 1:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =true;
+        break;
+    case 2:
+        WebSocketManager::ALG_BOTTOM =true;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    case 3:
+        WebSocketManager::ALG_BOTTOM =true;
+        WebSocketManager::ALG_RIGHT =true;
+        break;
+    default:
+        WebSocketManager::ALG_BOTTOM =false;
+        WebSocketManager::ALG_RIGHT =false;
+        break;
+    }
 }
 
 void WebSocketManager::onTextMessageReceived(QString message)
@@ -78,6 +90,8 @@ void WebSocketManager::onTextMessageReceived(QString message)
     QString type = data["type"].toString();
     QJsonObject payload = data["payload"].toObject();
 
+    qDebug() << payload;
+
     if (type == "auth") {
         clients.clear();
         QJsonArray infos = payload["connections"].toArray()[0].toObject()["clientInfos"].toArray();
@@ -88,8 +102,6 @@ void WebSocketManager::onTextMessageReceived(QString message)
         if(!payload["apiKey"].toString().isEmpty()) {
             DatabaseManager::set("apiKey", payload["apiKey"].toString());
         }
-
-        qDebug() << payload;
 
         for (const QJsonValue &val : infos) {
             QJsonObject obj = val.toObject();
