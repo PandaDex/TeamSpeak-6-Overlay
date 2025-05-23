@@ -22,15 +22,24 @@ class WebSocketManager : public QObject {
 
 public:
     explicit WebSocketManager(QWidget *overlayParent, QObject *parent = nullptr);
+    static WebSocketManager* instance();
     void connectToServer();
     bool ALG_RIGHT;
     bool ALG_BOTTOM;
+    void forceReconnect();
 
 private slots:
     void onConnected();
+    void onDisconnected();
+    void onError(QAbstractSocket::SocketError error);
     void onTextMessageReceived(QString message);
 
 private:
+    void showSpeakingClient(const ClientInfo &client);
+    void removeSpeakingClient(const QString &clientId);
+    void scheduleReconnect();
+
+    static WebSocketManager* m_instance;
     QWebSocket socket;
     QList<ClientInfo> clients;
     QString currentId;
@@ -39,8 +48,7 @@ private:
     QMap<QString, UserBubble*> bubbles;
     QNetworkAccessManager networkManager;
 
-    void showSpeakingClient(const ClientInfo &client);
-    void removeSpeakingClient(const QString &clientId);
+    int reconnectAttempts = 0;
 };
 
-#endif
+#endif // WEBSOCKETMANAGER_H

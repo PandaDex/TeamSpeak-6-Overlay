@@ -2,6 +2,7 @@
 #include "databasemanager.h"
 #include <QDebug>
 #include <QDateTime>
+#include <QTimer>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QPixmap>
@@ -9,76 +10,88 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QUrl>
+#include <algorithm>
+
+WebSocketManager* WebSocketManager::m_instance = nullptr;
+
+WebSocketManager* WebSocketManager::instance()
+{
+    return m_instance;
+}
 
 WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
-    : QObject(parent), overlay(overlayParent)
+    : QObject(parent), overlay(overlayParent), reconnectAttempts(0)
 {
+    m_instance = this;
     connect(&socket, &QWebSocket::connected, this, &WebSocketManager::onConnected);
     connect(&socket, &QWebSocket::textMessageReceived, this, &WebSocketManager::onTextMessageReceived);
+    connect(&socket, &QWebSocket::disconnected, this, &WebSocketManager::onDisconnected);
+    connect(&socket, &QWebSocket::errorOccurred, this, &WebSocketManager::onError);
 }
 
 void WebSocketManager::connectToServer()
 {
-    connect(&socket, &QWebSocket::errorOccurred, this, [this](QAbstractSocket::SocketError error){
-        qDebug() << "WebSocket error:" << socket.errorString();
+    if (socket.state() == QAbstractSocket::ConnectedState || socket.state() == QAbstractSocket::ConnectingState)
+        return;
 
-        if(socket.errorString() == "The remote host closed the connection") {
-            DatabaseManager::set("apiKey", "");
-            connectToServer();
-        }
-    });
-
+    qDebug() << "Attempting to connect to WebSocket server...";
     socket.open(QUrl("ws://localhost:5899/"));
 }
-
-
 
 void WebSocketManager::onConnected()
 {
     qDebug() << "WebSocket connected";
+    reconnectAttempts = 0; // Reset reconnect attempt counter
+
     QJsonObject payload, content;
 
     QString apiKey = DatabaseManager::get("apiKey");
-    if (!apiKey.isEmpty()) {
-        content["apiKey"] = apiKey;
-    } else {
-        content["apiKey"] = "";
-        qDebug() << "No API key available for authentication";
-    }
+    content["apiKey"] = apiKey.isEmpty() ? "" : apiKey;
 
     payload["type"] = "auth";
-    QJsonObject details;
-    details["identifier"] = "dex.teamspeak6.overlay";
-    details["version"] = "1.0.0";
-    details["name"] = "Teamspeak Overlay";
-    details["description"] = "Shows speaking clients on screen";
-    details["content"] = content;
+    QJsonObject details{
+        {"identifier", "dex.teamspeak6.overlay"},
+        {"version", "1.0.0"},
+        {"name", "Teamspeak Overlay"},
+        {"description", "Shows speaking clients on screen"},
+        {"content", content}
+    };
     payload["payload"] = details;
 
     socket.sendTextMessage(QJsonDocument(payload).toJson(QJsonDocument::Compact));
 
-    switch(DatabaseManager::get("overlayPosition").toInt()) {
-    case 0:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
-    case 1:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =true;
-        break;
-    case 2:
-        WebSocketManager::ALG_BOTTOM =true;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
-    case 3:
-        WebSocketManager::ALG_BOTTOM =true;
-        WebSocketManager::ALG_RIGHT =true;
-        break;
-    default:
-        WebSocketManager::ALG_BOTTOM =false;
-        WebSocketManager::ALG_RIGHT =false;
-        break;
+    int position = DatabaseManager::get("overlayPosition").toInt();
+    WebSocketManager::ALG_BOTTOM = position / 2;
+    WebSocketManager::ALG_RIGHT = position % 2;
+}
+
+void WebSocketManager::onDisconnected()
+{
+    qWarning() << "WebSocket disconnected.";
+    QString apiKey = DatabaseManager::get("apiKey");
+    if (!apiKey.isEmpty()) {
+        qInfo() << "Connection closed after authentication, resetting API key.";
+        DatabaseManager::set("apiKey", "");
     }
+
+    scheduleReconnect();
+}
+
+void WebSocketManager::onError(QAbstractSocket::SocketError error)
+{
+    Q_UNUSED(error);
+    qWarning() << "WebSocket error:" << socket.errorString();
+    socket.abort();
+
+    scheduleReconnect();
+}
+
+void WebSocketManager::scheduleReconnect()
+{
+    int delay = qMin(30000, 1000 * (1 << reconnectAttempts));
+    qDebug() << "Reconnecting in" << delay / 1000 << "seconds...";
+    QTimer::singleShot(delay, this, &WebSocketManager::connectToServer);
+    reconnectAttempts++;
 }
 
 void WebSocketManager::onTextMessageReceived(QString message)
@@ -90,25 +103,33 @@ void WebSocketManager::onTextMessageReceived(QString message)
     QString type = data["type"].toString();
     QJsonObject payload = data["payload"].toObject();
 
-    qDebug() << payload;
+    qDebug() << "Received message of type:" << type;
 
     if (type == "auth") {
         clients.clear();
-        QJsonArray infos = payload["connections"].toArray()[0].toObject()["clientInfos"].toArray();
-        currentId = payload["connections"].toArray()[0].toObject()["clientId"].toString();
-        currentChannel = payload["connections"].toArray()[0].toObject()["clientInfos"].toArray()
-                             .first().toObject()["channelId"].toString().toInt();
 
-        if(!payload["apiKey"].toString().isEmpty()) {
-            DatabaseManager::set("apiKey", payload["apiKey"].toString());
+        QJsonArray connections = payload["connections"].toArray();
+        if (connections.isEmpty()) return;
+
+        QJsonObject connection = connections[0].toObject();
+        currentId = connection["clientId"].toString();
+        QJsonArray infos = connection["clientInfos"].toArray();
+        if (!infos.isEmpty()) {
+            currentChannel = infos.first().toObject()["channelId"].toInt();
+        }
+
+        QString newApiKey = payload["apiKey"].toString();
+        if (!newApiKey.isEmpty()) {
+            DatabaseManager::set("apiKey", newApiKey);
         }
 
         for (const QJsonValue &val : infos) {
             QJsonObject obj = val.toObject();
             ClientInfo info;
             info.id = obj["id"].toString();
-            info.nickname = obj["properties"].toObject()["nickname"].toString();
-            info.avatarUrl = obj["properties"].toObject()["myteamspeakAvatar"].toString().remove("2,");
+            QJsonObject props = obj["properties"].toObject();
+            info.nickname = props["nickname"].toString();
+            info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
             clients.append(info);
         }
     } else if (type == "talkStatusChanged") {
@@ -128,63 +149,54 @@ void WebSocketManager::onTextMessageReceived(QString message)
 
 void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
-    if (!bubbles.contains(client.id)) {
-        QString avatarUrl = client.avatarUrl;
+    if (bubbles.contains(client.id)) return;
 
-        if (avatarUrl.isEmpty()) {
-            qDebug() << "No avatar URL for client:" << client.nickname;
-            return;
-        }
-
-        if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
-            avatarUrl = "https://" + avatarUrl;
-        }
-
-        QUrl url(avatarUrl);
-        if (!url.isValid()) {
-            qDebug() << "Invalid avatar URL:" << avatarUrl;
-            return;
-        }
-
-        QNetworkRequest request(url);
-        QNetworkReply* reply = networkManager.get(request);
-
-        connect(reply, &QNetworkReply::finished, this, [=]() {
-            if (reply->error() != QNetworkReply::NoError) {
-                qDebug() << "Failed to load avatar from:" << avatarUrl << "Error:" << reply->errorString();
-                reply->deleteLater();
-                return;
-            }
-
-            QByteArray data = reply->readAll();
-            QPixmap avatar;
-            if (!avatar.loadFromData(data)) {
-                qDebug() << "Failed to load avatar image data for:" << client.nickname;
-                reply->deleteLater();
-                return;
-            }
-
-            UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
-            bubble->adjustSize();
-
-            int x = 10;
-            int y = 10 + bubbles.size() * 40;
-
-            if (WebSocketManager::ALG_RIGHT) {
-                x = overlay->width() - bubble->width() - 10;
-            }
-
-            if (WebSocketManager::ALG_BOTTOM) {
-                y = overlay->height() - bubble->height() - 10 - bubbles.size() * 40;
-            }
-
-            bubble->move(x, y);
-            bubble->show();
-            bubbles[client.id] = bubble;
-
-            reply->deleteLater();
-        });
+    QString avatarUrl = client.avatarUrl;
+    if (avatarUrl.isEmpty()) {
+        qDebug() << "No avatar URL for client:" << client.nickname;
+        return;
     }
+
+    if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
+        avatarUrl = "https://" + avatarUrl;
+    }
+
+    QUrl url(avatarUrl);
+    if (!url.isValid()) {
+        qDebug() << "Invalid avatar URL:" << avatarUrl;
+        return;
+    }
+
+    QNetworkRequest request(url);
+    QNetworkReply *reply = networkManager.get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [=]() {
+        reply->deleteLater();
+
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "Failed to load avatar from:" << avatarUrl << "Error:" << reply->errorString();
+            return;
+        }
+
+        QByteArray data = reply->readAll();
+        QPixmap avatar;
+        if (!avatar.loadFromData(data)) {
+            qDebug() << "Failed to load avatar image data for:" << client.nickname;
+            return;
+        }
+
+        UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
+        bubble->adjustSize();
+
+        int x = WebSocketManager::ALG_RIGHT ? overlay->width() - bubble->width() - 10 : 10;
+        int y = WebSocketManager::ALG_BOTTOM
+                    ? overlay->height() - bubble->height() - 10 - bubbles.size() * 40
+                    : 10 + bubbles.size() * 40;
+
+        bubble->move(x, y);
+        bubble->show();
+        bubbles[client.id] = bubble;
+    });
 }
 
 void WebSocketManager::removeSpeakingClient(const QString &clientId)
@@ -193,4 +205,11 @@ void WebSocketManager::removeSpeakingClient(const QString &clientId)
         bubbles[clientId]->deleteLater();
         bubbles.remove(clientId);
     }
+}
+
+void WebSocketManager::forceReconnect()
+{
+    qDebug() << "Force reconnect called.";
+    socket.abort();
+    reconnectAttempts = 0;
 }

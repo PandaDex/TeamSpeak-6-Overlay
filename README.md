@@ -9,7 +9,7 @@ Fields with \* are required for me to merge with master
 - [ ] polish websocket code. \*
 - [ ] More error handling so app won't crash so often. \*
 - [ ] Code optimalizations and cleanup. \*
-- [ ] Installer (99% NSIS) \*
+- [x] Installer (99% NSIS) \*
 - [x] Achive same functionality as electron version. \*
 - [ ] Diffrent way to store config.
 - [ ] Translations, currently planed are: Polish, German, Russian, Turkish and Czech

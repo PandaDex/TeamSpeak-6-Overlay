@@ -20,6 +20,9 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
   <widget class="QSpinBox" name="INPUT_Opacity">
    <property name="geometry">
     <rect>

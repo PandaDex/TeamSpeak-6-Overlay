@@ -1,6 +1,7 @@
 #include "overlaywindow.h"
 #include "databasemanager.h"
 #include "settingswindow.h"
+#include "websocketmanager.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -37,8 +38,12 @@ int main(int argc, char *argv[])
     QSystemTrayIcon *trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(QIcon(":/resources/icon@3x.png"));
 
-    // Create context menu for tray
     QMenu *trayMenu = new QMenu;
+
+    QAction *reconnectAction = new QAction("Force Reconnect", trayMenu);
+    QObject::connect(reconnectAction, &QAction::triggered, [&]() {
+        WebSocketManager::instance()->forceReconnect();
+    });
 
     QAction *settingsAction = new QAction("Settings", trayMenu);
     QObject::connect(settingsAction, &QAction::triggered, [&]() {
@@ -50,6 +55,7 @@ int main(int argc, char *argv[])
     QAction *quitAction = new QAction("Quit", trayMenu);
     QObject::connect(quitAction, &QAction::triggered, &a, &QApplication::quit);
 
+    trayMenu->addAction(reconnectAction);
     trayMenu->addAction(settingsAction);
     trayMenu->addAction(quitAction);
     trayIcon->setContextMenu(trayMenu);
