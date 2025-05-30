@@ -14,7 +14,7 @@ Currently in middle of full rewrite of the app using C++ and Qt6.
 
 Fields with \* are required for me to count this as stable release
 
-- [ ] polish websocket code. \*
+- [x] polish websocket code. \*
 - [ ] More error handling so app won't crash so often. \*
 - [ ] Code optimalizations and cleanup. \*
 - [x] Installer (99% NSIS) \*
