@@ -41,7 +41,7 @@ void WebSocketManager::connectToServer()
 void WebSocketManager::onConnected()
 {
     qDebug() << "WebSocket connected";
-    reconnectAttempts = 0; // Reset reconnect attempt counter
+    reconnectAttempts = 0;
 
     QJsonObject payload, content;
 
@@ -112,6 +112,7 @@ void WebSocketManager::onTextMessageReceived(QString message)
         if (connections.isEmpty()) return;
 
         QJsonObject connection = connections[0].toObject();
+        qDebug() << connection;
         currentId = connection["clientId"].toString();
         QJsonArray infos = connection["clientInfos"].toArray();
         if (!infos.isEmpty()) {
@@ -126,14 +127,16 @@ void WebSocketManager::onTextMessageReceived(QString message)
         for (const QJsonValue &val : infos) {
             QJsonObject obj = val.toObject();
             ClientInfo info;
-            info.id = obj["id"].toString();
+            qDebug() << obj["id"];
+
+            info.id = QString::number(obj["id"].toDouble());
             QJsonObject props = obj["properties"].toObject();
             info.nickname = props["nickname"].toString();
             info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
             clients.append(info);
         }
     } else if (type == "talkStatusChanged") {
-        QString clientId = payload["clientId"].toString();
+        QString clientId = QString::number(payload["clientId"].toDouble());
         int status = payload["status"].toInt();
 
         auto it = std::find_if(clients.begin(), clients.end(), [&](const ClientInfo &c) { return c.id == clientId; });
@@ -153,8 +156,8 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 
     QString avatarUrl = client.avatarUrl;
     if (avatarUrl.isEmpty()) {
-        qDebug() << "No avatar URL for client:" << client.nickname;
-        return;
+        qDebug() << "USING DEFAULT FALLBACK!!! No avatar URL for client:" << client.nickname;
+        avatarUrl = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
     }
 
     if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
