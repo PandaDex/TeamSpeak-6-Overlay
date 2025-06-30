@@ -147,6 +147,25 @@ void WebSocketManager::onTextMessageReceived(QString message)
                 removeSpeakingClient(it->id);
             }
         }
+    } else if (type == "clientMoved") {
+        QString clientId = QString::number(payload["clientId"].toDouble());
+        QJsonObject props = payload["properties"].toObject();
+        ClientInfo info;
+        if(props.isEmpty()) {qDebug() << "User props empty"; return;}
+
+        bool exists = false;
+        for (const ClientInfo& c : clients) {
+            if (c.id == clientId) {
+                exists = true;
+                break;
+            }
+        }
+
+        if (exists) {qDebug() << "User is in"; return;}
+        info.id = clientId;
+        info.nickname = props["nickname"].toString();
+        info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
+        clients.append(info);
     }
 }
 
@@ -154,11 +173,16 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
     if (bubbles.contains(client.id)) return;
 
-    QString avatarUrl = client.avatarUrl;
-    if (avatarUrl.isEmpty()) {
-        qDebug() << "USING DEFAULT FALLBACK!!! No avatar URL for client:" << client.nickname;
-        avatarUrl = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
-    }
+    //temp
+    QString avatarUrl ="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
+    qDebug() << "avatars disabled. Using fallback";
+
+
+    // QString avatarUrl = client.avatarUrl;
+    // if (avatarUrl.isEmpty()) {
+    //     qDebug() << "USING DEFAULT FALLBACK! No avatar URL for client:" << client.nickname << "got" << avatarUrl;
+    //     avatarUrl = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
+    // }
 
     if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
         avatarUrl = "https://" + avatarUrl;
@@ -192,9 +216,7 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
         bubble->adjustSize();
 
         int x = WebSocketManager::ALG_RIGHT ? overlay->width() - bubble->width() - 10 : 10;
-        int y = WebSocketManager::ALG_BOTTOM
-                    ? overlay->height() - bubble->height() - 10 - bubbles.size() * 40
-                    : 10 + bubbles.size() * 40;
+        int y = WebSocketManager::ALG_BOTTOM ? overlay->height() - bubble->height() - 10 - bubbles.size() * 30 : 10 + bubbles.size() * 30;
 
         bubble->move(x, y);
         bubble->show();
