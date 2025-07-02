@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        Logger::warning("System tray not available!");
+        LOG_WARNING("System tray not available!");
         return 1;
     }
 
@@ -102,11 +102,11 @@ int main(int argc, char *argv[])
 
 
 
-    Logger::debug("==CONFIG==");
-    Logger::debug(QString::number(VAR_CONFIG_POSITION));
-    Logger::debug(QString::number(VAR_CONFIG_PADDING));
-    Logger::debug(QString::number(VAR_CONFIG_OPACITY));
-    Logger::debug("==========");
+    LOG_DEBUG("==CONFIG==");
+    LOG_DEBUG(QString::number(VAR_CONFIG_POSITION));
+    LOG_DEBUG(QString::number(VAR_CONFIG_PADDING));
+    LOG_DEBUG(QString::number(VAR_CONFIG_OPACITY));
+    LOG_DEBUG("==========");
 
     w.show();
 

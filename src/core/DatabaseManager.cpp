@@ -7,17 +7,17 @@ void DatabaseManager::initialize()
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-        Logger::error("Failed to open database for initialization");
+        LOG_ERROR("Failed to open database for initialization");
         return;
     }
 
     QSqlQuery query;
     query.prepare("CREATE TABLE IF NOT EXISTS data (key TEXT PRIMARY KEY, value TEXT)");
     if (!query.exec()) {
-        Logger::error("Failed to create table: " + query.lastError().text());
+        LOG_ERROR("Failed to create table: " + query.lastError().text());
     }
 
-    Logger::info("Database probably ok");
+    LOG_INFO("Database probably ok");
 
     db.close();
 }
@@ -27,7 +27,7 @@ QString DatabaseManager::get(const QString &key)
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-         Logger::error("Failed to open database for get operation");
+         LOG_ERROR("Failed to open database for get operation");
         return QString();
     }
 
@@ -36,7 +36,7 @@ QString DatabaseManager::get(const QString &key)
     query.bindValue(":key", key);
 
     if (!query.exec()) {
-        Logger::error("Failed to execute get query: " + query.lastError().text());
+        LOG_ERROR("Failed to execute get query: " + query.lastError().text());
         db.close();
         return QString();
     }
@@ -45,7 +45,7 @@ QString DatabaseManager::get(const QString &key)
     if (query.next()) {
         value = query.value(0).toString();
     } else {
-         Logger::warning("No value found for key: " + key);
+         LOG_WARNING("No value found for key: " + key);
     }
 
     db.close();
@@ -57,7 +57,7 @@ bool DatabaseManager::set(const QString &key, const QString &value)
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-         Logger::error("Failed to open database for set operation");
+         LOG_ERROR("Failed to open database for set operation");
         return false;
     }
 
@@ -68,7 +68,7 @@ bool DatabaseManager::set(const QString &key, const QString &value)
 
     bool success = query.exec();
     if (!success) {
-         Logger::error("Failed to execute set query: " + query.lastError().text());
+         LOG_ERROR("Failed to execute set query: " + query.lastError().text());
     }
 
     db.close();
