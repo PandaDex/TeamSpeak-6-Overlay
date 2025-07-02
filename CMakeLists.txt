@@ -15,9 +15,9 @@ set(TS_FILES TeamSpeak-Overlay_pl_PL.ts)
 
 set(PROJECT_SOURCES
         src/main.cpp
-        src/overlaywindow.cpp
-        src/overlaywindow.h
-        src/overlaywindow.ui
+        src/ui/OverlayWindow.cpp
+        src/ui/OverlayWindow.h
+        src/ui/OverlayWindow.ui
         ${TS_FILES}
 )
 
@@ -27,13 +27,16 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(TeamSpeak-Overlay
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        src/userbubble.h src/userbubble.cpp
-        src/websocketmanager.h src/websocketmanager.cpp
+            src/ui/UserBubble.h src/ui/UserBubble.cpp
+            src/network/WebsocketManager.h src/network/WebsocketManager.cpp
         resources.qrc
         resources.rc
+            src/core/Logger.cpp
+            src/core/Logger.h
+            src/core/Constants.h
         ${app_icon_resource_windows}
-        src/databasemanager.h src/databasemanager.cpp
-        src/settingswindow.h src/settingswindow.cpp src/settingswindow.ui
+            src/core/databasemanager.h src/core/databasemanager.cpp
+            src/ui/SettingsWindow.h src/ui/SettingsWindow.cpp src/ui/SettingsWindow.ui
 
     )
 # Define target properties for Android with Qt 6 as:

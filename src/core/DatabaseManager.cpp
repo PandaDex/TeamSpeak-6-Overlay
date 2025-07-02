@@ -1,21 +1,23 @@
-#include "databasemanager.h"
+#include "DatabaseManager.h"
+#include "Constants.h"
+#include "Logger.h"
 
 void DatabaseManager::initialize()
 {
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-        qDebug() << "Failed to open database for initialization";
+        Logger::error("Failed to open database for initialization");
         return;
     }
 
     QSqlQuery query;
     query.prepare("CREATE TABLE IF NOT EXISTS data (key TEXT PRIMARY KEY, value TEXT)");
     if (!query.exec()) {
-        qDebug() << "Failed to create table:" << query.lastError().text();
+        Logger::error("Failed to create table: " + query.lastError().text());
     }
 
-    qDebug() << "Database probably ok";
+    Logger::info("Database probably ok");
 
     db.close();
 }
@@ -25,7 +27,7 @@ QString DatabaseManager::get(const QString &key)
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-        qDebug() << "Failed to open database for get operation";
+         Logger::error("Failed to open database for get operation");
         return QString();
     }
 
@@ -34,7 +36,7 @@ QString DatabaseManager::get(const QString &key)
     query.bindValue(":key", key);
 
     if (!query.exec()) {
-        qDebug() << "Failed to execute get query:" << query.lastError().text();
+        Logger::error("Failed to execute get query: " + query.lastError().text());
         db.close();
         return QString();
     }
@@ -43,7 +45,7 @@ QString DatabaseManager::get(const QString &key)
     if (query.next()) {
         value = query.value(0).toString();
     } else {
-        qDebug() << "No value found for key:" << key;
+         Logger::warning("No value found for key: " + key);
     }
 
     db.close();
@@ -55,7 +57,7 @@ bool DatabaseManager::set(const QString &key, const QString &value)
     QSqlDatabase db = getDatabase();
 
     if (!db.open()) {
-        qDebug() << "Failed to open database for set operation";
+         Logger::error("Failed to open database for set operation");
         return false;
     }
 
@@ -66,7 +68,7 @@ bool DatabaseManager::set(const QString &key, const QString &value)
 
     bool success = query.exec();
     if (!success) {
-        qDebug() << "Failed to execute set query:" << query.lastError().text();
+         Logger::error("Failed to execute set query: " + query.lastError().text());
     }
 
     db.close();
@@ -77,6 +79,6 @@ QSqlDatabase DatabaseManager::getDatabase()
 {
         //TEMP: db name;
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-        db.setDatabaseName("bombardiloCrocodilo.db");
+        db.setDatabaseName(Constants::DB_NAME);
         return db;
 }

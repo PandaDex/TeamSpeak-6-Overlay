@@ -1,30 +1,29 @@
-#include "userbubble.h"
+#include "UserBubble.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QHBoxLayout>
 #include <QLabel>
+#include "../core/Constants.h"
 
 UserBubble::UserBubble(const QString &username, const QPixmap &avatar, QWidget *parent)
     : QWidget(parent)
 {
-    int VAR_AVATAR_SIZE=20;
-
     // Create a rounded avatar pixmap
-    QPixmap scaledAvatar = avatar.scaled(VAR_AVATAR_SIZE, VAR_AVATAR_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    QPixmap roundedAvatar(VAR_AVATAR_SIZE, VAR_AVATAR_SIZE);
+    QPixmap scaledAvatar = avatar.scaled(Constants::DEFAULT_AVATAR_SIZE, Constants::DEFAULT_AVATAR_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QPixmap roundedAvatar(Constants::DEFAULT_AVATAR_SIZE, Constants::DEFAULT_AVATAR_SIZE);
     roundedAvatar.fill(Qt::transparent);
 
     QPainter painter(&roundedAvatar);
     painter.setRenderHint(QPainter::Antialiasing);
     QPainterPath path;
-    path.addEllipse(0, 0, VAR_AVATAR_SIZE, VAR_AVATAR_SIZE);
+    path.addEllipse(0, 0, Constants::DEFAULT_AVATAR_SIZE, Constants::DEFAULT_AVATAR_SIZE);
     painter.setClipPath(path);
     painter.drawPixmap(0, 0, scaledAvatar);
 
     // Avatar label
     avatarLabel = new QLabel(this);
     avatarLabel->setPixmap(roundedAvatar);
-    avatarLabel->setFixedSize(VAR_AVATAR_SIZE, VAR_AVATAR_SIZE);
+    avatarLabel->setFixedSize(Constants::DEFAULT_AVATAR_SIZE, Constants::DEFAULT_AVATAR_SIZE);
     avatarLabel->setStyleSheet("background: transparent;");
 
     // Username label

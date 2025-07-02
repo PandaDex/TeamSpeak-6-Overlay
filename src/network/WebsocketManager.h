@@ -9,7 +9,7 @@
 #include <QJsonArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include "userbubble.h"
+#include "../ui/UserBubble.h"
 
 struct ClientInfo {
     QString id;
@@ -24,8 +24,8 @@ public:
     explicit WebSocketManager(QWidget *overlayParent, QObject *parent = nullptr);
     static WebSocketManager* instance();
     void connectToServer();
-    bool ALG_RIGHT;
-    bool ALG_BOTTOM;
+    bool ALG_RIGHT{};
+    bool ALG_BOTTOM{};
     void forceReconnect();
 
 private slots:

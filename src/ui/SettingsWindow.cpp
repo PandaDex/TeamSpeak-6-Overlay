@@ -1,7 +1,7 @@
-#include "settingswindow.h"
+#include "SettingsWindow.h"
 #include "ui_settingswindow.h"
-#include "databasemanager.h"
-#include <QDebug>
+#include "../core/DatabaseManager.h"
+#include "../core/Constants.h"
 
 SettingsWindow::SettingsWindow(QWidget *parent)
     : QWidget(parent)
@@ -22,10 +22,10 @@ void SettingsWindow::showEvent(QShowEvent *event)
 void SettingsWindow::loadSettings()
 {
     QString opacity = DatabaseManager::get("overlayOpacity");
-    ui->INPUT_Opacity->setValue(opacity.isEmpty() ? 100 : opacity.toInt());
+    ui->INPUT_Opacity->setValue(opacity.isEmpty() ? Constants::DEFAULT_OPACITY : opacity.toInt());
 
     QString padding = DatabaseManager::get("overlayPadding");
-    ui->INPUT_Padding->setValue(padding.isEmpty() ? 10 : padding.toInt());
+    ui->INPUT_Padding->setValue(padding.isEmpty() ? Constants::DEFAULT_PADDING : padding.toInt());
 
     QString position = DatabaseManager::get("overlayPosition");
     ui->SELECT_Position->setCurrentIndex(position.isEmpty() ? 0 : position.toInt());

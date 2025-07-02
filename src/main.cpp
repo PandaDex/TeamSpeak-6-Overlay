@@ -1,7 +1,9 @@
-#include "overlaywindow.h"
-#include "databasemanager.h"
-#include "settingswindow.h"
-#include "websocketmanager.h"
+#include "ui/OverlayWindow.h"
+#include "core/DatabaseManager.h"
+#include "ui/SettingsWindow.h"
+#include "core/Constants.h"
+#include "core/Logger.h"
+#include "network/WebsocketManager.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -13,6 +15,7 @@
 
 int main(int argc, char *argv[])
 {
+    Logger::setLogLevel(Logger::Level::Info);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
     // Initialize database
@@ -30,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        qWarning("System tray not available!");
+        Logger::warning("System tray not available!");
         return 1;
     }
 
@@ -51,7 +54,6 @@ int main(int argc, char *argv[])
         settings->setAttribute(Qt::WA_DeleteOnClose);
         settings->show();
     });
-
     QAction *quitAction = new QAction("Quit", trayMenu);
     QObject::connect(quitAction, &QAction::triggered, &a, &QApplication::quit);
 
@@ -62,8 +64,8 @@ int main(int argc, char *argv[])
     trayIcon->show();
 
     int VAR_CONFIG_POSITION = 0;
-    int VAR_CONFIG_PADDING = 10;
-    int VAR_CONFIG_OPACITY = 100;
+    int VAR_CONFIG_PADDING = Constants::DEFAULT_PADDING;
+    int VAR_CONFIG_OPACITY = Constants::DEFAULT_OPACITY;
 
     if(!DatabaseManager::get("overlayPosition").isEmpty()){
         VAR_CONFIG_POSITION = DatabaseManager::get("overlayPosition").toInt();
@@ -98,11 +100,13 @@ int main(int argc, char *argv[])
 
     w.setWindowOpacity(VAR_CONFIG_OPACITY/100.0);
 
-    qDebug() << "==CONFIG==";
-    qDebug() << VAR_CONFIG_POSITION;
-    qDebug() << VAR_CONFIG_PADDING;
-    qDebug() << VAR_CONFIG_OPACITY;
-    qDebug() << "==========";
+
+
+    Logger::debug("==CONFIG==");
+    Logger::debug(QString::number(VAR_CONFIG_POSITION));
+    Logger::debug(QString::number(VAR_CONFIG_PADDING));
+    Logger::debug(QString::number(VAR_CONFIG_OPACITY));
+    Logger::debug("==========");
 
     w.show();
 
