@@ -1,7 +1,7 @@
 # Info
 
 Simple screen overlay that shows speaking users from the current channel in the upper left corner of the screen.
-Currently in middle of full rewrite of the app using C++ and Qt6.
+Currently, in progress of a full rewrite of the app using C++ and Qt6.
 
 ## Installation
 
@@ -12,19 +12,19 @@ Currently in middle of full rewrite of the app using C++ and Qt6.
 
 # TODO
 
-Fields with \* are required for me to count this as stable release
+Fields with \* are required for me to count this as a stable release
 
 - [x] polish websocket code. \*
-- [ ] More error handling so app won't crash so often. \*
-- [ ] Code optimalizations and cleanup. \*
+- [x] More error handling so the app won't crash so often. \*
+- [x] Code optimizations and cleanup. \*
 - [x] Installer (99% NSIS) \*
-- [x] Achive same functionality as electron version. \*
-- [ ] Diffrent way to store config.
-- [ ] Translations, currently planed are: Polish, German, Russian, Turkish and Czech
+- [x] Achieve the same functionality as an electron version. \*
+- [ ] Different way to store config.
+- [ ] Translations currently planned are: Polish, German, Russian, Turkish and Czech
 
 ## Issues and Feature Requests
 
-If you have any issues,bugs or feature requests, please create an issue on the [issues page](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues).
+If you have any issues, bugs or feature requests, please create an issue on the [issues page](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues).
 
 # Why the rewrite and Qt6
 

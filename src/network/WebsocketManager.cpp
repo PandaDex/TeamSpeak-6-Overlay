@@ -171,7 +171,7 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
     if (bubbles.contains(client.id)) return;
 
-    //temp
+    //NOTE: Avatars disabled due to an issue with ts api, will come back soon after I implement more error handling and validation for url
     QString avatarUrl = Constants::DEFAULT_AVATAR_URL;
     LOG_INFO("avatars disabled. Using fallback");
 

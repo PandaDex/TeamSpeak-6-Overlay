@@ -32,11 +32,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        LOG_WARNING("System tray not available!");
-        return 1;
-    }
-
     // Create the tray icon
     QSystemTrayIcon *trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(QIcon(":/resources/icon@3x.png"));
