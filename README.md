@@ -21,6 +21,7 @@ Fields with \* are required for me to count this as a stable release
 - [x] Achieve the same functionality as an electron version. \*
 - [ ] Different way to store config.
 - [ ] Translations currently planned are: Polish, German, Russian, Turkish and Czech
+- [ ] Display all clients on channel not only speaking clients
 
 ## Issues and Feature Requests
 
