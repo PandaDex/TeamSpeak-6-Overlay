@@ -1,7 +1,7 @@
 # Info
 
 Simple screen overlay that shows speaking users from the current channel in the upper left corner of the screen.
-Currently, in progress of a full rewrite of the app using C++ and Qt6.
+Made with C++ and QT6
 
 ## Installation
 
