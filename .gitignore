@@ -56,5 +56,6 @@ compile_commands.json
 build/*
 installer/**/*
 !installer/.gitkeep
-tools/**
+tools/nsis/**
 .idea/
+tools/ts-launch-hook/build/**

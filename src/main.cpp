@@ -95,8 +95,6 @@ int main(int argc, char *argv[])
 
     w.setWindowOpacity(VAR_CONFIG_OPACITY/100.0);
 
-
-
     LOG_DEBUG("==CONFIG==");
     LOG_DEBUG(QString::number(VAR_CONFIG_POSITION));
     LOG_DEBUG(QString::number(VAR_CONFIG_PADDING));

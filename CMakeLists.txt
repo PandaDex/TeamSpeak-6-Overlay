@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
 
-set(TS_FILES TeamSpeak-Overlay_pl_PL.ts)
+#set(TS_FILES TeamSpeak-Overlay_pl_PL.ts)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -39,24 +39,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
             src/ui/SettingsWindow.h src/ui/SettingsWindow.cpp src/ui/SettingsWindow.ui
 
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET TeamSpeak-Overlay APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
-    if(ANDROID)
-        add_library(TeamSpeak-Overlay SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
         add_executable(TeamSpeak-Overlay
             ${PROJECT_SOURCES}
         )
-    endif()
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
