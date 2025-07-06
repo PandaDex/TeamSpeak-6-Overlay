@@ -5,6 +5,7 @@
 #include "core/Logger.h"
 #include "network/WebsocketManager.h"
 
+#include "singleapplication.h"
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::Level::Info);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
+    SingleApplication single( argc, argv);
     // Initialize database
     DatabaseManager::initialize();
 
