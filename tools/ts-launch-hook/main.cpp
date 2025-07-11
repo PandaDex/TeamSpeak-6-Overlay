@@ -1,8 +1,26 @@
 ﻿#include <iostream>
-#include <fstream>
 #include <string>
-#include <thread>
 #include <windows.h>
+
+std::string GetOverlayPath() {
+    HKEY hKey;
+    const char* subKey = "SOFTWARE\\PandaDex\\TeamSpeakOverlay";
+    const char* valueName = "installDir";
+    char value[512];
+    DWORD value_length = sizeof(value);
+
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, subKey, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+        return "";
+    }
+
+    if (RegQueryValueExA(hKey, valueName, NULL, NULL, (LPBYTE)&value, &value_length) != ERROR_SUCCESS) {
+        RegCloseKey(hKey);
+        return "";
+    }
+
+    RegCloseKey(hKey);
+    return std::string(value);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     OutputDebugStringA("Starting teamspeak executable\n");
@@ -15,18 +33,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Sleep(5000);
 
-    std::ifstream file("overlay_path.txt");
-    if (!file) {
-        MessageBoxA(NULL, "Error: Could not open overlay_path.txt", "Error", MB_OK);
-        return 1;
-    }
-
-    std::string overlayProgramPath;
-    std::getline(file, overlayProgramPath);
-    file.close();
-
+    std::string overlayProgramPath = GetOverlayPath();
     if (overlayProgramPath.empty()) {
-        MessageBoxA(NULL, "Error: overlay_path.txt is empty", "Error", MB_OK);
+        MessageBoxA(NULL, "Error: Could not read overlay path from registry", "Error", MB_OK);
         return 1;
     }
 
