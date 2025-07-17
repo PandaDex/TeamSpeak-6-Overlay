@@ -37,7 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
             src/core/Logger.h
             src/core/Constants.h
         ${app_icon_resource_windows}
-            src/core/databasemanager.h src/core/databasemanager.cpp
+            src/core/DatabaseManager.h src/core/DatabaseManager.cpp
             src/ui/SettingsWindow.h src/ui/SettingsWindow.cpp src/ui/SettingsWindow.ui
 
     )

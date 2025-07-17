@@ -1,5 +1,5 @@
 #include "OverlayWindow.h"
-#include "./ui_overlaywindow.h"
+#include "./ui_OverlayWindow.h"
 #include "../network/WebsocketManager.h"
 
 OverlayWindow::OverlayWindow(QWidget *parent)

@@ -1,5 +1,5 @@
 #include "SettingsWindow.h"
-#include "ui_settingswindow.h"
+#include "ui_SettingsWindow.h"
 #include "../core/DatabaseManager.h"
 #include "../core/Constants.h"
 
