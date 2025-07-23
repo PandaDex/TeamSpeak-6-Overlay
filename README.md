@@ -27,6 +27,10 @@ Fields with \* are required for me to count this as a stable release
 
 If you have any issues, bugs or feature requests, please create an issue on the [issues page](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues).
 
+# Sign the Contributor License Agreement
+To contribute, sign our Contributor License Agreement.
+[Click Here](https://cla-assistant.io/PandaDex/TeamSpeak-6-Overlay) to sign before submitting a pull request.
+
 # Why the rewrite and Qt6
 
 I decided to rewrite it for two main reasons:
