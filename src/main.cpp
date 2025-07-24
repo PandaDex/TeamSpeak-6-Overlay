@@ -16,7 +16,7 @@
 
 int main(int argc, char *argv[])
 {
-    Logger::setLogLevel(Logger::Level::Info);
+    Logger::setLogLevel(Logger::Level::Debug);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
     SingleApplication single( argc, argv);

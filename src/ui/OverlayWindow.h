@@ -2,6 +2,7 @@
 #define OVERLAYWINDOW_H
 
 #include <QWidget>
+#include <qboxlayout.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,6 +17,7 @@ class OverlayWindow : public QWidget
 public:
     OverlayWindow(QWidget *parent = nullptr);
     ~OverlayWindow();
+    QWidget* getLayoutContainer();
 
 private:
     Ui::OverlayWindow *ui;

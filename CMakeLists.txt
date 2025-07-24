@@ -30,6 +30,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
             src/ui/UserBubble.h src/ui/UserBubble.cpp
+            src/ui/MessageBubble.h src/ui/MessageBubble.cpp
             src/network/WebsocketManager.h src/network/WebsocketManager.cpp
         resources.qrc
         resources.rc

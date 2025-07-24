@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QUrl>
 #include <algorithm>
+#include "../ui/MessageBubble.h"
 
 WebSocketManager* WebSocketManager::m_instance = nullptr;
 
@@ -164,6 +165,18 @@ void WebSocketManager::onTextMessageReceived(QString message)
         info.nickname = props["nickname"].toString();
         info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
         clients.append(info);
+    } else if (type == "textMessage") {
+        QJsonValue tempInvoker = payload["invoker"];
+        QString clientName = tempInvoker["nickname"].toString();
+        QString msg = payload["message"].toString();
+
+        LOG_DEBUG("Text message received from clientId: " + clientName + ", message: " + msg);
+
+        if (!clientName.isEmpty()) {
+            onUserMessageReceived(clientName, msg);
+        } else {
+            LOG_WARNING("Client not found for message: " + clientName);
+        }
     }
 }
 
@@ -171,16 +184,8 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
     if (bubbles.contains(client.id)) return;
 
-    //NOTE: Avatars disabled due to an issue with ts api, will come back soon after I implement more error handling and validation for url
     QString avatarUrl = Constants::DEFAULT_AVATAR_URL;
     LOG_INFO("avatars disabled. Using fallback");
-
-
-    // QString avatarUrl = client.avatarUrl;
-    // if (avatarUrl.isEmpty()) {
-    //     qDebug() << "USING DEFAULT FALLBACK! No avatar URL for client:" << client.nickname << "got" << avatarUrl;
-    //     avatarUrl = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
-    // }
 
     if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
         avatarUrl = "https://" + avatarUrl;
@@ -213,12 +218,27 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
         UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
         bubble->adjustSize();
 
-        int x = ALG_RIGHT ? overlay->width() - bubble->width() - Constants::BUBBLE_MARGIN : Constants::BUBBLE_MARGIN;
-        int y = ALG_BOTTOM ? overlay->height() - bubble->height() - Constants::BUBBLE_MARGIN - bubbles.size() * Constants::BUBBLE_VERTICAL_SPACING : Constants::BUBBLE_MARGIN + bubbles.size() * Constants::BUBBLE_VERTICAL_SPACING;
-
-        bubble->move(x, y);
         bubble->show();
         bubbles[client.id] = bubble;
+    });
+}
+
+void WebSocketManager::onUserMessageReceived(QString clientName, QString message)
+{
+    LOG_INFO("Displaying message from: " + clientName + " | message: " + message);
+
+    MessageBubble *msgBubble = new MessageBubble(clientName, message, overlay);
+    msgBubble->adjustSize();
+
+    msgBubble->show();
+
+    messageBubbles[clientName] = msgBubble;
+
+    QTimer::singleShot(5000, this, [this, clientName]() {
+        if (messageBubbles.contains(clientName)) {
+            messageBubbles[clientName]->deleteLater();
+            messageBubbles.remove(clientName);
+        }
     });
 }
 

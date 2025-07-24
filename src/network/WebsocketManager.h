@@ -10,6 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "../ui/UserBubble.h"
+#include "../ui/MessageBubble.h"
 
 struct ClientInfo {
     QString id;
@@ -36,9 +37,11 @@ private slots:
 
 private:
     void showSpeakingClient(const ClientInfo &client);
+    void onUserMessageReceived(const QString clientName, QString message);
     void removeSpeakingClient(const QString &clientId);
     void scheduleReconnect();
 
+    QMap<QString, MessageBubble*> messageBubbles;
     static WebSocketManager* m_instance;
     QWebSocket socket;
     QList<ClientInfo> clients;

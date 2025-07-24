@@ -37,5 +37,14 @@ UserBubble::UserBubble(const QString &username, const QPixmap &avatar, QWidget *
     layout->addWidget(avatarLabel);
     layout->addWidget(nameLabel);
 
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     setLayout(layout);
+
+    if (parent) {
+        QVBoxLayout *parentLayout = parent->findChild<QVBoxLayout*>();
+        if (parentLayout) {
+            parentLayout->addWidget(this);
+        }
+    }
 }
