@@ -2,13 +2,21 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "../core/Constants.h"
 
 MessageBubble::MessageBubble(const QString &username, const QString &message, QWidget *parent)
     : QWidget(parent)
 {
+
+    QString trimmed;
+    if (message.length() > 11) {
+        trimmed = message;
+        trimmed.chop(3);
+        trimmed += "...";
+    }
+
+
     // Username label
-    nameLabel = new QLabel(username+": "+message, this);
+    nameLabel = new QLabel(username+": "+trimmed, this);
     nameLabel->setStyleSheet("color: white; font-weight: bold; padding-left: 6px; padding-right: 6px; background-color: rgba(0, 0, 0, 120); border-radius: 6px");
 
     // Layout
