@@ -27,7 +27,15 @@ WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
     connect(&socket, &QWebSocket::connected, this, &WebSocketManager::onConnected);
     connect(&socket, &QWebSocket::textMessageReceived, this, &WebSocketManager::onTextMessageReceived);
     connect(&socket, &QWebSocket::disconnected, this, &WebSocketManager::onDisconnected);
+    //linux build fix
+    //on ubuntu we are using an older version of QT5
+    //fuck i hate this
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(&socket, &QWebSocket::errorOccurred, this, &WebSocketManager::onError);
+#else
+    connect(&socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+            this, &WebSocketManager::onError);
+#endif
 }
 
 void WebSocketManager::connectToServer()

@@ -20,6 +20,20 @@ set(PROJECT_SOURCES
         src/ui/OverlayWindow.cpp
         src/ui/OverlayWindow.h
         src/ui/OverlayWindow.ui
+        src/ui/UserBubble.h
+        src/ui/UserBubble.cpp
+        src/ui/MessageBubble.h
+        src/ui/MessageBubble.cpp
+        src/ui/SettingsWindow.h
+        src/ui/SettingsWindow.cpp
+        src/ui/SettingsWindow.ui
+        src/network/WebsocketManager.h
+        src/network/WebsocketManager.cpp
+        src/core/Logger.cpp
+        src/core/Logger.h
+        src/core/Constants.h
+        src/core/DatabaseManager.h
+        src/core/DatabaseManager.cpp
         ${TS_FILES}
 )
 
@@ -27,27 +41,21 @@ set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(TeamSpeak-Overlay
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-            src/ui/UserBubble.h src/ui/UserBubble.cpp
-            src/ui/MessageBubble.h src/ui/MessageBubble.cpp
-            src/network/WebsocketManager.h src/network/WebsocketManager.cpp
-        resources.qrc
-        resources.rc
-            src/core/Logger.cpp
-            src/core/Logger.h
-            src/core/Constants.h
-        ${app_icon_resource_windows}
-            src/core/DatabaseManager.h src/core/DatabaseManager.cpp
-            src/ui/SettingsWindow.h src/ui/SettingsWindow.cpp src/ui/SettingsWindow.ui
-
+            MANUAL_FINALIZATION
+            ${PROJECT_SOURCES}
+            resources.qrc
+            resources.rc
+            ${app_icon_resource_windows}
     )
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
-        add_executable(TeamSpeak-Overlay
+    add_executable(TeamSpeak-Overlay
             ${PROJECT_SOURCES}
-        )
+            resources.qrc
+            resources.rc
+            ${app_icon_resource_windows}
+    )
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
@@ -58,21 +66,21 @@ target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Q
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.dex.TeamSpeak-Overlay)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.dex.TeamSpeak-Overlay)
 endif()
 set_target_properties(TeamSpeak-Overlay PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+        ${BUNDLE_ID_OPTION}
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        MACOSX_BUNDLE TRUE
+        WIN32_EXECUTABLE TRUE
 )
 
 include(GNUInstallDirs)
 install(TARGETS TeamSpeak-Overlay
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION .
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
