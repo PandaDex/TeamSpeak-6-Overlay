@@ -204,19 +204,6 @@
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>270</y>
-     <width>131</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Install Launch Hook</string>
-   </property>
-  </widget>
  </widget>
  <resources>
   <include location="../../resources.qrc"/>

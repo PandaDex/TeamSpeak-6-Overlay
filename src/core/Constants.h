@@ -15,7 +15,7 @@ namespace Constants {
     const QString WEBSOCKET_URL = "ws://localhost:5899/";
 
     const QString APP_IDENTIFIER = "dex.teamspeak6.overlay";
-    const QString APP_VERSION = "1.0.2";
+    const QString APP_VERSION = "1.0.3";
     const QString APP_NAME = "Teamspeak Overlay";
     const QString APP_DESCRIPTION = "Shows speaking clients on screen";
 

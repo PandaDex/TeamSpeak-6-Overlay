@@ -173,19 +173,20 @@ void WebSocketManager::onTextMessageReceived(QString message)
         info.nickname = props["nickname"].toString();
         info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
         clients.append(info);
-    } else if (type == "textMessage") {
-        QJsonValue tempInvoker = payload["invoker"];
-        QString clientName = tempInvoker["nickname"].toString();
-        QString msg = payload["message"].toString();
-
-        LOG_DEBUG("Text message received from clientId: " + clientName + ", message: " + msg);
-
-        if (!clientName.isEmpty()) {
-            onUserMessageReceived(clientName, msg);
-        } else {
-            LOG_WARNING("Client not found for message: " + clientName);
-        }
     }
+    // else if (type == "textMessage") {
+    //     QJsonValue tempInvoker = payload["invoker"];
+    //     QString clientName = tempInvoker["nickname"].toString();
+    //     QString msg = payload["message"].toString();
+    //
+    //     LOG_DEBUG("Text message received from clientId: " + clientName + ", message: " + msg);
+    //
+    //     if (!clientName.isEmpty()) {
+    //         onUserMessageReceived(clientName, msg);
+    //     } else {
+    //         LOG_WARNING("Client not found for message: " + clientName);
+    //     }
+    // }
 }
 
 void WebSocketManager::showSpeakingClient(const ClientInfo &client)

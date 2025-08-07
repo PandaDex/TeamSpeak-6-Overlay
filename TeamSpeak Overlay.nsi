@@ -7,7 +7,7 @@
 !define APP_NAME "TeamSpeak Overlay"
 !define COMP_NAME "PandaDex"
 !define WEB_SITE "https://github.com/PandaDex/TeamSpeak-6-Overlay"
-!define VERSION "0.0.0.0"
+!define VERSION "0.1.0.3"
 !define COPYRIGHT ""
 !define DESCRIPTION "Application"
 !define INSTALLER_NAME ".\build\TeamSpeak Overlay.exe"
