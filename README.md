@@ -1,44 +1,65 @@
-# Info
+# TeamSpeak 6 Overlay
 
-Simple screen overlay that shows speaking users from the current channel in the upper left corner of the screen.
-Made with C++ and QT6
+[![Release](https://img.shields.io/github/v/release/PandaDex/TeamSpeak-6-Overlay)](https://github.com/PandaDex/TeamSpeak-6-Overlay/releases)
+[![Downloads](https://img.shields.io/github/downloads/PandaDex/TeamSpeak-6-Overlay/total)](https://github.com/PandaDex/TeamSpeak-6-Overlay/releases)
+[![Issues](https://img.shields.io/github/issues/PandaDex/TeamSpeak-6-Overlay)](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues)
+[![License](https://img.shields.io/github/license/PandaDex/TeamSpeak-6-Overlay)](LICENSE)
 
-## Installation
+A lightweight, performance-focused in-game overlay for TeamSpeak 5 and 6 that displays speaking users from your current channel on screen.
 
-1. Download the latest version from the [releases page](https://github.com/PandaDex/TeamSpeak-6-Overlay/releases).
-2. Run the installer.
-3. After installation, accept the connection request in the TeamSpeak client. <br>
-   ![Accept-Connection](./markdown/accept.png)
+<img src="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/markdown/game_720.png" height="300" />
 
-# TODO
+## 🚀 Quick Start
 
-Fields with \* are required for me to count this as a stable release
+### Installation
 
-- [x] polish websocket code. \*
-- [x] More error handling so the app won't crash so often. \*
-- [x] Code optimizations and cleanup. \*
-- [x] Installer (99% NSIS) \*
-- [x] Achieve the same functionality as an electron version. \*
-- [ ] Different way to store config.
-- [ ] Translations currently planned are: Polish, German, Russian, Turkish and Czech
-- [ ] Display all clients on channel not only speaking clients
+1. **Download** the latest version from the [releases page](https://github.com/PandaDex/TeamSpeak-6-Overlay/releases)
+2. **Run** the installer
+3. **Accept** the connection request in your TeamSpeak client when prompted
+4. **Done!** The overlay will automatically appear when users speak
 
-## Issues and Feature Requests
+## 🛠️ Development Status
 
-If you have any issues, bugs or feature requests, please create an issue on the [issues page](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues).
+This project is currently in active development. The Qt6 rewrite(currently master) focuses on performance and maintainability improvements over the previous Electron version.
 
-# Sign the Contributor License Agreement
-To contribute, sign our Contributor License Agreement.
-[Click Here](https://cla-assistant.io/PandaDex/TeamSpeak-6-Overlay) to sign before submitting a pull request.
+### Current Roadmap
 
-# Why the rewrite and Qt6
+#### Priority Features (Required for Stable Release)
 
-I decided to rewrite it for two main reasons:
+- [x] **Polish WebSocket code** - Improve connection stability
+- [x] **Enhanced error handling** - Reduce crashes and improve reliability
+- [x] **Code optimization** - Performance improvements and cleanup
+- [x] **NSIS Installer** - Simple windows installer
+- [x] **Feature parity** - Match all Electron version capabilities
 
-- **Performance** – Electron is great for full desktop apps, but memory usage is brutal. This overlay used around 150 MB of RAM, while the Qt6 version uses around 50 MB.
-- **Maintainability** – This project wasn’t originally meant to become what it is. I started working on the overlay for fun, because when me and my friends switched from Discord to TeamSpeak 6, I missed that feature. I didn’t care if something was done well or if it was throwing a bunch of errors, I just wanted a simple app to see who joined voice chat or who was currently talking. So there’s a lot that needs fixing and rethinking. Even if I stay with Electron, I would still have to rewrite the app.
+#### Future Enhancements
 
-## Screenshots
+- [ ] **Improved configuration storage** - Better settings management
+- [ ] **Show all channel users** - Display non-speaking participants
+- [ ] **Multi-language support** - Planned: Polish, German, Russian, Turkish, Czech
 
-![Desktop-Screen](./markdown/desktop.png)
-![InGame-Screen](./markdown/game.png)
+## 🐛 Issues & Support
+
+Found a bug or have a feature request? Please [create an issue](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues) with:
+
+- Your operating system
+- TeamSpeak client version
+- Steps to reproduce the issue
+- Screenshots if applicable
+
+## 🤝 Contributing
+
+Contributions are welcome! Whether it's:
+
+- Bug reports and fixes
+- Feature suggestions and implementations
+- Documentation improvements
+- Translations
+
+**Before contributing code**, please note that all contributors must sign a Contributor License Agreement (CLA) to ensure proper licensing and legal clarity for the project.
+
+Please feel free to open an issue or submit a pull request.
+
+## 📄 License
+
+This project is licensed under the [GPL-3.0 License](LICENSE) - see the LICENSE file for details.
