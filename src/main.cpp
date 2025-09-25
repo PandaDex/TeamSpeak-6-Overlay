@@ -16,7 +16,7 @@
 
 int main(int argc, char *argv[])
 {
-    Logger::setLogLevel(Logger::Level::Debug);
+    Logger::setLogLevel(Logger::Level::Warning);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
     SingleApplication single( argc, argv);
@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
     int VAR_CONFIG_POSITION = 0;
     int VAR_CONFIG_PADDING = Constants::DEFAULT_PADDING;
     int VAR_CONFIG_OPACITY = Constants::DEFAULT_OPACITY;
+
+    if(DatabaseManager::get("fontSize").isEmpty()) {
+        DatabaseManager::set("fontSize", "12");
+    }
 
     if(!DatabaseManager::get("overlayPosition").isEmpty()){
         VAR_CONFIG_POSITION = DatabaseManager::get("overlayPosition").toInt();
