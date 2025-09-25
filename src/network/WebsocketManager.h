@@ -37,7 +37,7 @@ private slots:
 
 private:
     void showSpeakingClient(const ClientInfo &client);
-    void onUserMessageReceived(const QString clientName, QString message);
+    void onUserMessageReceived(const QString clientName, QString message,int id);
     void removeSpeakingClient(const QString &clientId);
     void scheduleReconnect();
 
