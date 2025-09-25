@@ -49,32 +49,32 @@ jobs:
       - name: Deploy Qt
         run: |
           cd build/Release
-          windeployqt.exe --qmldir ../../ --release --no-translations --no-system-d3d-compiler --no-opengl-sw TeamSpeak-6-Overlay.exe
+          windeployqt.exe --qmldir ../../ --release --no-translations --no-system-d3d-compiler --no-opengl-sw TeamSpeak-Overlay.exe
 
       - name: Create portable package
         run: |
-          mkdir TeamSpeak-6-Overlay-Windows
-          copy build\Release\* TeamSpeak-6-Overlay-Windows\
+          mkdir TeamSpeak-Overlay-Windows
+          copy build\Release\* TeamSpeak-Overlay-Windows\
           # Copy any additional required files
-          if (Test-Path "README.md") { copy README.md TeamSpeak-6-Overlay-Windows\ }
-          if (Test-Path "LICENSE") { copy LICENSE TeamSpeak-6-Overlay-Windows\ }
+          if (Test-Path "README.md") { copy README.md TeamSpeak-Overlay-Windows\ }
+          if (Test-Path "LICENSE") { copy LICENSE TeamSpeak-Overlay-Windows\ }
 
       - name: Create ZIP archive
         run: |
-          Compress-Archive -Path TeamSpeak-6-Overlay-Windows -DestinationPath TeamSpeak-6-Overlay-Windows.zip
+          Compress-Archive -Path TeamSpeak-Overlay-Windows -DestinationPath TeamSpeak-Overlay-Windows.zip
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: TeamSpeak-6-Overlay-Windows
-          path: TeamSpeak-6-Overlay-Windows.zip
+          name: TeamSpeak-Overlay-Windows
+          path: TeamSpeak-Overlay-Windows.zip
           retention-days: 30
 
       - name: Create Release (if requested)
         if: ${{ github.event.inputs.create_release == 'true' }}
         uses: softprops/action-gh-release@v2
         with:
-          files: TeamSpeak-6-Overlay-Windows.zip
+          files: TeamSpeak-Overlay-Windows.zip
           draft: false
           prerelease: false
           tag_name: ${{ github.run_number }}-build
