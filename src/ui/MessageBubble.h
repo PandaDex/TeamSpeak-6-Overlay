@@ -13,7 +13,7 @@ public:
     explicit MessageBubble(const QString &username, const QString &message, QWidget *parent = nullptr);
 
 private:
-    QLabel *nameLabel;
+    QLabel *messageLabel;
 };
 
 
