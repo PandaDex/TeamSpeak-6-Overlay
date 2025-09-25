@@ -1,0 +1,83 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "Create a GitHub release"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.1"
+          host: "windows"
+          target: "desktop"
+          arch: "win64_msvc2022_64"
+          modules: "qtwebsockets qtnetworkauth"
+          cache: "true"
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config Release --parallel 4
+
+      - name: Deploy Qt
+        run: |
+          cd build/Release
+          windeployqt.exe --qmldir ../../ --release --no-translations --no-system-d3d-compiler --no-opengl-sw TeamSpeak-6-Overlay.exe
+
+      - name: Create portable package
+        run: |
+          mkdir TeamSpeak-6-Overlay-Windows
+          copy build\Release\* TeamSpeak-6-Overlay-Windows\
+          # Copy any additional required files
+          if (Test-Path "README.md") { copy README.md TeamSpeak-6-Overlay-Windows\ }
+          if (Test-Path "LICENSE") { copy LICENSE TeamSpeak-6-Overlay-Windows\ }
+
+      - name: Create ZIP archive
+        run: |
+          Compress-Archive -Path TeamSpeak-6-Overlay-Windows -DestinationPath TeamSpeak-6-Overlay-Windows.zip
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeamSpeak-6-Overlay-Windows
+          path: TeamSpeak-6-Overlay-Windows.zip
+          retention-days: 30
+
+      - name: Create Release (if requested)
+        if: ${{ github.event.inputs.create_release == 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: TeamSpeak-6-Overlay-Windows.zip
+          draft: false
+          prerelease: false
+          tag_name: ${{ github.run_number }}-build
+          name: "Build ${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

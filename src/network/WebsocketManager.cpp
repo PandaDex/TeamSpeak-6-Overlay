@@ -12,6 +12,7 @@
 #include <QUrl>
 #include <algorithm>
 #include "../ui/MessageBubble.h"
+#include <QRandomGenerator>
 
 WebSocketManager* WebSocketManager::m_instance = nullptr;
 
@@ -27,15 +28,7 @@ WebSocketManager::WebSocketManager(QWidget *overlayParent, QObject *parent)
     connect(&socket, &QWebSocket::connected, this, &WebSocketManager::onConnected);
     connect(&socket, &QWebSocket::textMessageReceived, this, &WebSocketManager::onTextMessageReceived);
     connect(&socket, &QWebSocket::disconnected, this, &WebSocketManager::onDisconnected);
-    //linux build fix
-    //on ubuntu we are using an older version of QT5
-    //fuck i hate this
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(&socket, &QWebSocket::errorOccurred, this, &WebSocketManager::onError);
-#else
-    connect(&socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
-            this, &WebSocketManager::onError);
-#endif
 }
 
 void WebSocketManager::connectToServer()
@@ -174,19 +167,21 @@ void WebSocketManager::onTextMessageReceived(QString message)
         info.avatarUrl = props["myteamspeakAvatar"].toString().remove("2,");
         clients.append(info);
     }
-    // else if (type == "textMessage") {
-    //     QJsonValue tempInvoker = payload["invoker"];
-    //     QString clientName = tempInvoker["nickname"].toString();
-    //     QString msg = payload["message"].toString();
-    //
-    //     LOG_DEBUG("Text message received from clientId: " + clientName + ", message: " + msg);
-    //
-    //     if (!clientName.isEmpty()) {
-    //         onUserMessageReceived(clientName, msg);
-    //     } else {
-    //         LOG_WARNING("Client not found for message: " + clientName);
-    //     }
-    // }
+    else if (type == "textMessage") {
+        QJsonValue tempInvoker = payload["invoker"];
+        QString clientName = tempInvoker["nickname"].toString();
+        QString msg = payload["message"].toString();
+
+        int rnd_id = QRandomGenerator::global()->bounded(100);
+
+        LOG_DEBUG("Text message received from clientId: " + clientName + ", message: " + msg);
+
+        if (!clientName.isEmpty()) {
+            onUserMessageReceived(clientName, msg, rnd_id);
+        } else {
+            LOG_WARNING("Client not found for message: " + clientName);
+        }
+    }
 }
 
 void WebSocketManager::showSpeakingClient(const ClientInfo &client)
@@ -232,7 +227,7 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
     });
 }
 
-void WebSocketManager::onUserMessageReceived(QString clientName, QString message)
+void WebSocketManager::onUserMessageReceived(QString clientName, QString message, int id)
 {
     LOG_INFO("Displaying message from: " + clientName + " | message: " + message);
 
@@ -240,13 +235,14 @@ void WebSocketManager::onUserMessageReceived(QString clientName, QString message
     msgBubble->adjustSize();
 
     msgBubble->show();
+    QString idS = QString::number(id);
 
-    messageBubbles[clientName] = msgBubble;
+    messageBubbles[clientName+message+idS] = msgBubble;
 
-    QTimer::singleShot(5000, this, [this, clientName]() {
-        if (messageBubbles.contains(clientName)) {
-            messageBubbles[clientName]->deleteLater();
-            messageBubbles.remove(clientName);
+    QTimer::singleShot(5000, this, [this, clientName, message,idS]() {
+        if (messageBubbles.contains(clientName+message+idS)) {
+            messageBubbles[clientName+message+idS]->deleteLater();
+            messageBubbles.remove(clientName+message+idS);
         }
     });
 }
