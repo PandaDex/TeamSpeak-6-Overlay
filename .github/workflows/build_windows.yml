@@ -51,6 +51,19 @@ jobs:
           cd build/Release
           windeployqt.exe --qmldir ../../ --release TeamSpeak-Overlay.exe
 
+          if (-not (Test-Path "platforms")) `
+          {
+            New-Item -ItemType Directory -Path "platforms"
+            Copy-Item "${{ env.Qt6_DIR }}/plugins/platforms/qwindows.dll" "platforms/"
+            Copy-Item "${{ env.Qt6_DIR }}/plugins/platforms/qminimal.dll" "platforms/"
+          }
+
+          if (-not (Test-Path "platforms/qwindows.dll")) `
+          {
+            Write-Error "Critical platform plugin qwindows.dll not found!"
+            exit 1
+          }
+
       - name: Create portable package
         run: |
           mkdir TeamSpeak-Overlay-Windows
