@@ -49,12 +49,14 @@ jobs:
       - name: Deploy Qt
         run: |
           cd build/Release
-          windeployqt6.exe --qmldir ../../ TeamSpeak-Overlay.exe
+          mkdir bin
+          copy TeamSpeak-Overlay.exe ./bin
+          windeployqt6.exe --qmldir ../../ ./bin/TeamSpeak-Overlay.exe
 
       - name: Create portable package
         run: |
           mkdir TeamSpeak-Overlay-Windows
-          copy build\Release\* TeamSpeak-Overlay-Windows\
+          copy build\Release\bin\* TeamSpeak-Overlay-Windows\
 
       - name: Create ZIP archive
         run: |
@@ -64,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: TeamSpeak-Overlay-Windows
-          path: TeamSpeak-Overlay-Windows.zip
+          path: TeamSpeak-Overlay-Windows
           retention-days: 30
 
       - name: Create Release (if requested)
