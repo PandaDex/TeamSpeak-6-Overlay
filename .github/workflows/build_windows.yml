@@ -56,7 +56,7 @@ jobs:
       - name: Create portable package
         run: |
           mkdir TeamSpeak-Overlay-Windows
-          copy build\Release\bin\* TeamSpeak-Overlay-Windows\
+          Copy-Item -Path build\Release\bin\* -Destination TeamSpeak-Overlay-Windows\ -Recurse -Force
 
       - name: Create ZIP archive
         run: |
