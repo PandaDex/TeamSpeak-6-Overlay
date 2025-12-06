@@ -12,7 +12,6 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
 
-#set(TS_FILES TeamSpeak-Overlay_pl_PL.ts)
 add_subdirectory(src/thirdparty/singleapplication)
 
 set(PROJECT_SOURCES
@@ -58,6 +57,12 @@ else()
     )
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+endif()
+
+if(UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+    target_link_libraries(TeamSpeak-Overlay PRIVATE ${X11_LIBRARIES} ${X11_Xext_LIB})
+    target_include_directories(TeamSpeak-Overlay PRIVATE ${X11_INCLUDE_DIR})
 endif()
 
 target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::WebSockets Qt${QT_VERSION_MAJOR}::Sql SingleApplication::SingleApplication)

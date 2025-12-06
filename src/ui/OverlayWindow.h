@@ -19,6 +19,9 @@ public:
     ~OverlayWindow();
     QWidget* getLayoutContainer();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private:
     Ui::OverlayWindow *ui;
 };
