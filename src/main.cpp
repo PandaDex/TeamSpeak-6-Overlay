@@ -4,7 +4,6 @@
 #include "core/Constants.h"
 #include "core/Logger.h"
 #include "network/WebsocketManager.h"
-
 #include "singleapplication.h"
 #include <QApplication>
 #include <QLocale>
@@ -13,13 +12,14 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::Level::Warning);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
-    SingleApplication single( argc, argv);
+    SingleApplication single(argc, argv);
     // Initialize database
     DatabaseManager::initialize();
 
@@ -99,8 +99,6 @@ int main(int argc, char *argv[])
                screenGeometry.top() + VAR_CONFIG_PADDING);
     }
 
-    w.setWindowOpacity(VAR_CONFIG_OPACITY/100.0);
-
     LOG_DEBUG("==CONFIG==");
     LOG_DEBUG(QString::number(VAR_CONFIG_POSITION));
     LOG_DEBUG(QString::number(VAR_CONFIG_PADDING));
@@ -109,6 +107,10 @@ int main(int argc, char *argv[])
 
     w.show();
 
+    // This ensures opacity works properly on Linux X11
+    QTimer::singleShot(0, [&w, VAR_CONFIG_OPACITY]() {
+        w.setWindowOpacity(VAR_CONFIG_OPACITY / 100.0);
+    });
+
     return a.exec();
 }
-

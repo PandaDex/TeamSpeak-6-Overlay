@@ -25,9 +25,11 @@ OverlayWindow::OverlayWindow(QWidget *parent)
         if (position == "2") {
             ui->verticalLayout->setAlignment(Qt::AlignBottom);
         } else if (position == "3") {
-            ui->verticalLayout->setAlignment(Qt::AlignBottom);
+            ui->verticalLayout->setAlignment(Qt::AlignBottom | Qt::AlignRight);
+        } else if (position == "1") {
+            ui->verticalLayout->setAlignment(Qt::AlignTop | Qt::AlignRight);
         } else {
-            ui->verticalLayout->setAlignment(Qt::AlignTop);
+               ui->verticalLayout->setAlignment(Qt::AlignTop);
         }
     } else {
         ui->verticalLayout->setAlignment(Qt::AlignTop);
