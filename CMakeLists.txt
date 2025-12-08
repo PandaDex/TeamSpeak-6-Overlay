@@ -9,8 +9,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets Sql)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets)
 
 add_subdirectory(src/thirdparty/singleapplication)
 
@@ -31,8 +31,8 @@ set(PROJECT_SOURCES
         src/core/Logger.cpp
         src/core/Logger.h
         src/core/Constants.h
-        src/core/DatabaseManager.h
-        src/core/DatabaseManager.cpp
+        src/core/ConfigManager.h
+        src/core/ConfigManager.cpp
         ${TS_FILES}
 )
 
@@ -46,8 +46,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
             resources.rc
             ${app_icon_resource_windows}
     )
-
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
     add_executable(TeamSpeak-Overlay
             ${PROJECT_SOURCES}
@@ -55,8 +53,6 @@ else()
             resources.rc
             ${app_icon_resource_windows}
     )
-
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -65,7 +61,7 @@ if(UNIX AND NOT APPLE)
     target_include_directories(TeamSpeak-Overlay PRIVATE ${X11_INCLUDE_DIR})
 endif()
 
-target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::WebSockets Qt${QT_VERSION_MAJOR}::Sql SingleApplication::SingleApplication)
+target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::WebSockets SingleApplication::SingleApplication)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

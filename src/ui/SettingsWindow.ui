@@ -46,31 +46,11 @@
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>180</y>
-     <width>181</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>English</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Polish</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QPushButton" name="BTN_Save">
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>260</y>
+     <y>270</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -164,44 +144,6 @@
    </property>
    <property name="text">
     <string>Overlay Opacity</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>155</y>
-     <width>241</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Language (not implemented yet)</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>310</y>
-     <width>641</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#aa0000;&quot;&gt;App needs to be restarted for changes to apply!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::TextFormat::RichText</enum>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
  </widget>
