@@ -9,7 +9,7 @@ A lightweight, performance-focused in-game overlay for TeamSpeak 5 and 6 that di
 
 <img src="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/markdown/game_720.png" height="300" />
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -18,7 +18,7 @@ A lightweight, performance-focused in-game overlay for TeamSpeak 5 and 6 that di
 3. **Accept** the connection request in your TeamSpeak client when prompted
 4. **Done!** The overlay will automatically appear when users speak
 
-## 🛠️ Development Status
+## Development Status
 
 This project is currently in active development. The Qt6 rewrite(currently master) focuses on performance and maintainability improvements over the previous Electron version.
 
@@ -34,11 +34,10 @@ This project is currently in active development. The Qt6 rewrite(currently maste
 
 #### Future Enhancements
 
-- [ ] **Improved configuration storage** - Better settings management
-- [ ] **Show all channel users** - Display non-speaking participants
-- [ ] **Multi-language support** - Planned: Polish, German, Russian, Turkish, Czech
+- [x] **Improved configuration storage** - Better settings management
+- [ ] **Bubble redesign** - Redesign user and message bubbles, make it more unified.
 
-## 🐛 Issues & Support
+## Issues & Support
 
 Found a bug or have a feature request? Please [create an issue](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues) with:
 
@@ -47,7 +46,7 @@ Found a bug or have a feature request? Please [create an issue](https://github.c
 - Steps to reproduce the issue
 - Screenshots if applicable
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Whether it's:
 
@@ -60,6 +59,7 @@ Contributions are welcome! Whether it's:
 
 Please feel free to open an issue or submit a pull request.
 
-## 📄 License
+## License
 
 This project is licensed under the [GPL-3.0 License](LICENSE) - see the LICENSE file for details.
+
