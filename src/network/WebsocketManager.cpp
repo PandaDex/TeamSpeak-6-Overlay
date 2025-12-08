@@ -1,5 +1,5 @@
 #include "WebsocketManager.h"
-#include "../core/DatabaseManager.h"
+#include "../core/ConfigManager.h"
 #include "../core/Constants.h"
 #include "../core/Logger.h"
 #include <QTimer>
@@ -47,7 +47,7 @@ void WebSocketManager::onConnected()
 
     QJsonObject payload, content;
 
-    QString apiKey = DatabaseManager::get("apiKey");
+    QString apiKey = ConfigManager::get("apiKey");
     content["apiKey"] = apiKey.isEmpty() ? "" : apiKey;
 
     payload["type"] = "auth";
@@ -62,7 +62,7 @@ void WebSocketManager::onConnected()
 
     socket.sendTextMessage(QJsonDocument(payload).toJson(QJsonDocument::Compact));
 
-    int position = DatabaseManager::get("overlayPosition").toInt();
+    int position = ConfigManager::get("overlayPosition").toInt();
     ALG_BOTTOM = position / 2;
     ALG_RIGHT = position % 2;
 }
@@ -70,10 +70,10 @@ void WebSocketManager::onConnected()
 void WebSocketManager::onDisconnected()
 {
     LOG_INFO("WebSocket disconnected.");
-    QString apiKey = DatabaseManager::get("apiKey");
+    QString apiKey = ConfigManager::get("apiKey");
     if (!apiKey.isEmpty()) {
         LOG_INFO("Connection closed after authentication, resetting API key.");
-        DatabaseManager::set("apiKey", "");
+        ConfigManager::set("apiKey", "");
     }
 
     scheduleReconnect();
@@ -122,7 +122,7 @@ void WebSocketManager::onTextMessageReceived(QString message)
 
         QString newApiKey = payload["apiKey"].toString();
         if (!newApiKey.isEmpty()) {
-            DatabaseManager::set("apiKey", newApiKey);
+            ConfigManager::set("apiKey", newApiKey);
         }
 
         for (const QJsonValue &val : infos) {

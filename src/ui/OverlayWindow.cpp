@@ -1,7 +1,7 @@
 #include "OverlayWindow.h"
 #include "./ui_OverlayWindow.h"
 #include "../network/WebsocketManager.h"
-#include "../core/DatabaseManager.h"
+#include "../core/ConfigManager.h"
 
 #ifdef Q_OS_LINUX
 #include <QGuiApplication>
@@ -20,21 +20,32 @@ OverlayWindow::OverlayWindow(QWidget *parent)
     setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    if(!DatabaseManager::get("overlayPosition").isEmpty()) {
-        QString position = DatabaseManager::get("overlayPosition");
-        if (position == "2") {
+    auto updateAlignment = [this](const QString& position) {
+        if (position == "0") {
+            ui->verticalLayout->setAlignment(Qt::AlignTop);
+        } else if (position == "1") {
+            ui->verticalLayout->setAlignment(Qt::AlignTop | Qt::AlignRight);
+        } else if (position == "2") {
             ui->verticalLayout->setAlignment(Qt::AlignBottom);
         } else if (position == "3") {
             ui->verticalLayout->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-        } else if (position == "1") {
-            ui->verticalLayout->setAlignment(Qt::AlignTop | Qt::AlignRight);
-        } else {
-               ui->verticalLayout->setAlignment(Qt::AlignTop);
         }
-    } else {
-        ui->verticalLayout->setAlignment(Qt::AlignTop);
-    }
+    };
 
+    QObject::connect(ConfigManager::instance(), &ConfigManager::configChanged,
+            this, [this, updateAlignment](const QString& key, const QString& value) {
+                if (key == "overlayPosition") {
+                    updateAlignment(value);
+                }
+            });
+
+    QString position = ConfigManager::get("overlayPosition");
+    if (position.isEmpty()) {
+        position = "0";
+    }
+    updateAlignment(position);
+
+    // Initialize WebSocket
     WebSocketManager *wsManager = new WebSocketManager(this);
     wsManager->connectToServer();
 }
@@ -44,22 +55,19 @@ void OverlayWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 
 #ifdef Q_OS_LINUX
-    // Set X11 properties to make window click-thru
+    // Set X11 properties to make window click-through
     QWindow *window = windowHandle();
     if (window) {
         auto *native = qApp->nativeInterface<QNativeInterface::QX11Application>();
         if (native) {
             Display *display = native->display();
-
             if (display) {
                 Window xWindow = static_cast<Window>(winId());
-
                 XRectangle rect;
                 rect.x = 0;
                 rect.y = 0;
                 rect.width = 0;
                 rect.height = 0;
-
                 XShapeCombineRectangles(display, xWindow, ShapeInput, 0, 0, &rect, 0, ShapeSet, 0);
             }
         }
@@ -67,7 +75,8 @@ void OverlayWindow::showEvent(QShowEvent *event)
 #endif
 }
 
-QWidget* OverlayWindow::getLayoutContainer()  {
+QWidget* OverlayWindow::getLayoutContainer()
+{
     return ui->verticalLayoutWidget;
 }
 

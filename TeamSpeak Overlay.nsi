@@ -1,7 +1,7 @@
 ############################################################################################
 #      NSIS Installation Script created by NSIS Quick Setup Script Generator v1.09.18
-#               Entirely Edited with NullSoft Scriptable Installation System                
-#              by Vlasis K. Barkas aka Red Wine red_wine@freemail.gr Sep 2006               
+#               Entirely Edited with NullSoft Scriptable Installation System
+#              by Vlasis K. Barkas aka Red Wine red_wine@freemail.gr Sep 2006
 ############################################################################################
 
 !define APP_NAME "TeamSpeak Overlay"
@@ -89,7 +89,6 @@ File "${SOURCE_DIR}\opengl32sw.dll"
 File "${SOURCE_DIR}\Qt6Core.dll"
 File "${SOURCE_DIR}\Qt6Gui.dll"
 File "${SOURCE_DIR}\Qt6Network.dll"
-File "${SOURCE_DIR}\Qt6Sql.dll"
 File "${SOURCE_DIR}\Qt6Svg.dll"
 File "${SOURCE_DIR}\Qt6WebSockets.dll"
 File "${SOURCE_DIR}\Qt6Widgets.dll"
@@ -130,13 +129,6 @@ File "${SOURCE_DIR}\tls\qcertonlybackend.dll"
 File "${SOURCE_DIR}\tls\qschannelbackend.dll"
 SetOutPath "$INSTDIR\styles"
 File "${SOURCE_DIR}\styles\qmodernwindowsstyle.dll"
-SetOutPath "$INSTDIR\sqldrivers"
-File "${SOURCE_DIR}\sqldrivers\qsqlibase.dll"
-File "${SOURCE_DIR}\sqldrivers\qsqlite.dll"
-File "${SOURCE_DIR}\sqldrivers\qsqlmimer.dll"
-File "${SOURCE_DIR}\sqldrivers\qsqloci.dll"
-File "${SOURCE_DIR}\sqldrivers\qsqlodbc.dll"
-File "${SOURCE_DIR}\sqldrivers\qsqlpsql.dll"
 SetOutPath "$INSTDIR\platforms"
 File "${SOURCE_DIR}\platforms\qwindows.dll"
 SetOutPath "$INSTDIR\networkinformation"
@@ -256,7 +248,7 @@ Delete "$INSTDIR\imageformats\qjpeg.dll"
 Delete "$INSTDIR\imageformats\qsvg.dll"
 Delete "$INSTDIR\iconengines\qsvgicon.dll"
 Delete "$INSTDIR\generic\qtuiotouchplugin.dll"
- 
+
 RmDir "$INSTDIR\generic"
 RmDir "$INSTDIR\iconengines"
 RmDir "$INSTDIR\imageformats"
@@ -266,7 +258,7 @@ RmDir "$INSTDIR\sqldrivers"
 RmDir "$INSTDIR\styles"
 RmDir "$INSTDIR\tls"
 RmDir "$INSTDIR\translations"
- 
+
 Delete "$INSTDIR\uninstall.exe"
 !ifdef WEB_SITE
 Delete "$INSTDIR\${APP_NAME} website.url"
@@ -300,4 +292,3 @@ DeleteRegKey ${REG_ROOT} "${UNINSTALL_PATH}"
 SectionEnd
 
 ######################################################################
-

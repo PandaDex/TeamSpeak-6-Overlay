@@ -2,13 +2,13 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "../core/DatabaseManager.h"
+#include "../core/ConfigManager.h"
 
 MessageBubble::MessageBubble(const QString &username, const QString &message, QWidget *parent)
     : QWidget(parent)
 {
 
-    QString fontSize = DatabaseManager::get("fontSize");
+    QString fontSize = ConfigManager::get("fontSize");
 
 
     messageLabel = new QLabel(username+": "+message, this);
