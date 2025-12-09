@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(TeamSpeak-Overlay VERSION 1.0.3 LANGUAGES CXX)
+project(TeamSpeak-Overlay VERSION 1.0.4 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -37,8 +37,6 @@ set(PROJECT_SOURCES
 set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    find_package(Qt6 REQUIRED COMPONENTS Widgets)
-
     qt_add_executable(TeamSpeak-Overlay
             MANUAL_FINALIZATION
             ${PROJECT_SOURCES}
@@ -62,7 +60,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::WebSockets SingleApplication::SingleApplication)
-target_link_libraries(TeamSpeak-Overlay PRIVATE Qt6::Widgets)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
