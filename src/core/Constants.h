@@ -4,7 +4,7 @@
 #include <QString>
 
 namespace Constants {
-    constexpr int DEFAULT_AVATAR_SIZE = 20;
+    constexpr int DEFAULT_AVATAR_SIZE = 32;
     constexpr int DEFAULT_PADDING = 10;
     constexpr int DEFAULT_OPACITY = 100;
     constexpr int BUBBLE_VERTICAL_SPACING = 30;
@@ -21,7 +21,7 @@ namespace Constants {
 
     const QString DB_NAME = "config.db";
 
-    const QString DEFAULT_AVATAR_URL = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%401x.ico";
+    const QString DEFAULT_AVATAR_URL = "https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/resources/icon%403x.png";
 }
 
 #endif // CONSTANTS_H
