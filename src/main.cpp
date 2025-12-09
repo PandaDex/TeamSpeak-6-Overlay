@@ -6,8 +6,6 @@
 #include "network/WebsocketManager.h"
 #include "singleapplication.h"
 #include <QApplication>
-#include <QLocale>
-#include <QTranslator>
 #include <QScreen>
 #include <QSystemTrayIcon>
 #include <QMenu>

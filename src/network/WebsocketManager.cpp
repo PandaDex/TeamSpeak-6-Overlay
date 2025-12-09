@@ -11,7 +11,7 @@
 #include <QJsonArray>
 #include <QUrl>
 #include <algorithm>
-#include "../ui/MessageBubble.h"
+#include "../ui/NewBubble.h"
 #include <QRandomGenerator>
 
 WebSocketManager* WebSocketManager::m_instance = nullptr;
@@ -184,6 +184,71 @@ void WebSocketManager::onTextMessageReceived(QString message)
     }
 }
 
+void WebSocketManager::loadAvatarWithCache(const QString &avatarUrl, std::function<void(const QPixmap&)> callback)
+{
+    // Check if avatar is already cached
+    if (avatarCache.contains(avatarUrl)) {
+        LOG_INFO("Using cached avatar for URL: " + avatarUrl);
+        callback(avatarCache[avatarUrl]);
+        return;
+    }
+
+    if (pendingAvatarRequests.contains(avatarUrl)) {
+        LOG_INFO("Avatar request already in progress for URL: " + avatarUrl);
+        pendingAvatarCallbacks[avatarUrl].append(callback);
+        return;
+    }
+
+    QString finalUrl = avatarUrl;
+    if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+        finalUrl = "https://" + finalUrl;
+    }
+
+    QUrl url(finalUrl);
+    if (!url.isValid()) {
+        LOG_WARNING("Invalid avatar URL: " + finalUrl);
+        return;
+    }
+
+    LOG_INFO("Fetching avatar from URL: " + finalUrl);
+    QNetworkRequest request(url);
+    QNetworkReply *reply = networkManager.get(request);
+
+    pendingAvatarRequests.insert(avatarUrl);
+    pendingAvatarCallbacks[avatarUrl].append(callback);
+
+    connect(reply, &QNetworkReply::finished, this, [=]() {
+        reply->deleteLater();
+
+        pendingAvatarRequests.remove(avatarUrl);
+
+        if (reply->error() != QNetworkReply::NoError) {
+            LOG_ERROR("Failed to load avatar from: " + finalUrl + " Error: " + reply->errorString());
+            pendingAvatarCallbacks.remove(avatarUrl);
+            return;
+        }
+
+        QByteArray data = reply->readAll();
+        QPixmap avatar;
+        if (!avatar.loadFromData(data)) {
+            LOG_ERROR("Failed to load avatar image data");
+            pendingAvatarCallbacks.remove(avatarUrl);
+            return;
+        }
+
+        // Cache the avatar
+        avatarCache[avatarUrl] = avatar;
+        LOG_INFO("Avatar cached for URL: " + avatarUrl);
+
+        if (pendingAvatarCallbacks.contains(avatarUrl)) {
+            for (const auto &cb : pendingAvatarCallbacks[avatarUrl]) {
+                cb(avatar);
+            }
+            pendingAvatarCallbacks.remove(avatarUrl);
+        }
+    });
+}
+
 void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 {
     if (bubbles.contains(client.id)) return;
@@ -191,37 +256,11 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
     QString avatarUrl = Constants::DEFAULT_AVATAR_URL;
     LOG_INFO("avatars disabled. Using fallback");
 
-    if (!avatarUrl.startsWith("http://") && !avatarUrl.startsWith("https://")) {
-        avatarUrl = "https://" + avatarUrl;
-    }
-
-    QUrl url(avatarUrl);
-    if (!url.isValid()) {
-        LOG_WARNING("Invalid avatar URL: " + avatarUrl);
-        return;
-    }
-
-    QNetworkRequest request(url);
-    QNetworkReply *reply = networkManager.get(request);
-
-    connect(reply, &QNetworkReply::finished, this, [=]() {
-        reply->deleteLater();
-
-        if (reply->error() != QNetworkReply::NoError) {
-            LOG_ERROR("Failed to load avatar from: " + avatarUrl + " Error: " + reply->errorString());
-            return;
-        }
-
-        QByteArray data = reply->readAll();
-        QPixmap avatar;
-        if (!avatar.loadFromData(data)) {
-            LOG_ERROR("Failed to load avatar image data for: " + client.nickname);
-            return;
-        }
-
-        UserBubble *bubble = new UserBubble(client.nickname, avatar, overlay);
+    loadAvatarWithCache(avatarUrl, [=](const QPixmap &avatar) {
+        bool r = false;
+        if(ConfigManager::get("overlayPosition") == "1" || ConfigManager::get("overlayPosition") == "3") r = true;
+        NewBubble *bubble = new NewBubble(client.nickname, avatar, nullptr,r, overlay);
         bubble->adjustSize();
-
         bubble->show();
         bubbles[client.id] = bubble;
     });
@@ -230,20 +269,26 @@ void WebSocketManager::showSpeakingClient(const ClientInfo &client)
 void WebSocketManager::onUserMessageReceived(QString clientName, QString message, int id)
 {
     LOG_INFO("Displaying message from: " + clientName + " | message: " + message);
+    QString avatarUrl = Constants::DEFAULT_AVATAR_URL;
 
-    MessageBubble *msgBubble = new MessageBubble(clientName, message, overlay);
-    msgBubble->adjustSize();
+    LOG_INFO("avatars disabled. Using fallback");
 
-    msgBubble->show();
-    QString idS = QString::number(id);
+    loadAvatarWithCache(avatarUrl, [=](const QPixmap &avatar) {
+        bool r = false;
+        if(ConfigManager::get("overlayPosition") == "1" || ConfigManager::get("overlayPosition") == "3") r = true;
+        NewBubble *msgBubble = new NewBubble(clientName, avatar, message, r, overlay);
+        msgBubble->adjustSize();
+        msgBubble->show();
 
-    messageBubbles[clientName+message+idS] = msgBubble;
+        QString idS = QString::number(id);
+        messageBubbles[clientName + message + idS] = msgBubble;
 
-    QTimer::singleShot(5000, this, [this, clientName, message,idS]() {
-        if (messageBubbles.contains(clientName+message+idS)) {
-            messageBubbles[clientName+message+idS]->deleteLater();
-            messageBubbles.remove(clientName+message+idS);
-        }
+        QTimer::singleShot(6000, this, [this, clientName, message, idS]() {
+            if (messageBubbles.contains(clientName + message + idS)) {
+                messageBubbles[clientName + message + idS]->deleteLater();
+                messageBubbles.remove(clientName + message + idS);
+            }
+        });
     });
 }
 

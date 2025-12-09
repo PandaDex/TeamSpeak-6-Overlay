@@ -9,8 +9,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Network WebSockets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network WebSockets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network WebSockets)
 
 add_subdirectory(src/thirdparty/singleapplication)
 
@@ -19,13 +19,11 @@ set(PROJECT_SOURCES
         src/ui/OverlayWindow.cpp
         src/ui/OverlayWindow.h
         src/ui/OverlayWindow.ui
-        src/ui/UserBubble.h
-        src/ui/UserBubble.cpp
-        src/ui/MessageBubble.h
-        src/ui/MessageBubble.cpp
         src/ui/SettingsWindow.h
         src/ui/SettingsWindow.cpp
         src/ui/SettingsWindow.ui
+        src/ui/NewBubble.cpp
+        src/ui/NewBubble.h
         src/network/WebsocketManager.h
         src/network/WebsocketManager.cpp
         src/core/Logger.cpp
@@ -39,6 +37,8 @@ set(PROJECT_SOURCES
 set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
     qt_add_executable(TeamSpeak-Overlay
             MANUAL_FINALIZATION
             ${PROJECT_SOURCES}
@@ -62,6 +62,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_link_libraries(TeamSpeak-Overlay PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::WebSockets SingleApplication::SingleApplication)
+target_link_libraries(TeamSpeak-Overlay PRIVATE Qt6::Widgets)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

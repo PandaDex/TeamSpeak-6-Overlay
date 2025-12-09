@@ -9,8 +9,7 @@
 #include <QJsonArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include "../ui/UserBubble.h"
-#include "../ui/MessageBubble.h"
+#include "../ui/NewBubble.h"
 
 struct ClientInfo {
     QString id;
@@ -41,15 +40,21 @@ private:
     void removeSpeakingClient(const QString &clientId);
     void scheduleReconnect();
 
-    QMap<QString, MessageBubble*> messageBubbles;
+    QMap<QString, NewBubble*> messageBubbles;
     static WebSocketManager* m_instance;
     QWebSocket socket;
     QList<ClientInfo> clients;
     QString currentId;
     int currentChannel = -1;
     QWidget *overlay;
-    QMap<QString, UserBubble*> bubbles;
+    QMap<QString, NewBubble*> bubbles;
     QNetworkAccessManager networkManager;
+
+    QHash<QString, QPixmap> avatarCache;
+    QSet<QString> pendingAvatarRequests;
+    QHash<QString, QList<std::function<void(const QPixmap&)>>> pendingAvatarCallbacks;
+
+    void loadAvatarWithCache(const QString &avatarUrl, std::function<void(const QPixmap&)> callback);
 
     int reconnectAttempts = 0;
 };
