@@ -35,8 +35,9 @@ This project is currently in active development. The Qt6 rewrite(currently maste
 #### Future Enhancements
 
 - [x] **Improved configuration storage** - Better settings management
-- [ ] **Bubble redesign** - Redesign user and message bubbles, make it more unified.
-
+- [x] **Bubble redesign** - Redesign user and message bubbles, make it more unified.
+- [ ] **Appearance customization** - Additional setting: font, font size, background & text colors, toggle avatars, toggle messages.
+- [ ] **Avatar fix** - Finally fix avatar logic to use clients avatars instead of placeholder
 ## Issues & Support
 
 Found a bug or have a feature request? Please [create an issue](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues) with:
@@ -62,4 +63,5 @@ Please feel free to open an issue or submit a pull request.
 ## License
 
 This project is licensed under the [GPL-3.0 License](LICENSE) - see the LICENSE file for details.
+
 
