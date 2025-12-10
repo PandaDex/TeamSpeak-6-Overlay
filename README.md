@@ -5,9 +5,10 @@
 [![Issues](https://img.shields.io/github/issues/PandaDex/TeamSpeak-6-Overlay)](https://github.com/PandaDex/TeamSpeak-6-Overlay/issues)
 [![License](https://img.shields.io/github/license/PandaDex/TeamSpeak-6-Overlay)](LICENSE)
 
-A lightweight, performance-focused in-game overlay for TeamSpeak 5 and 6 that displays speaking users from your current channel on screen.
+A relatively lightweight, performance-focused in-game overlay for TeamSpeak 6 that displays speaking clients and incoming messages on screen.
 
-<img src="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/markdown/game_720.png" height="300" />
+<img src="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/markdown/EscapeFromTarkov_W1GfotoTHw%20(Custom).jpg" height="300" />
+<img src="https://raw.githubusercontent.com/PandaDex/TeamSpeak-6-Overlay/refs/heads/master/markdown/EscapeFromTarkov_bi55EWFCcg%20(Custom).jpg" height="300" />
 
 ## Quick Start
 
@@ -54,7 +55,6 @@ Contributions are welcome! Whether it's:
 - Bug reports and fixes
 - Feature suggestions and implementations
 - Documentation improvements
-- Translations
 
 **Before contributing code**, please note that all contributors must sign a Contributor License Agreement (CLA) to ensure proper licensing and legal clarity for the project.
 
@@ -63,5 +63,6 @@ Please feel free to open an issue or submit a pull request.
 ## License
 
 This project is licensed under the [GPL-3.0 License](LICENSE) - see the LICENSE file for details.
+
 
 
