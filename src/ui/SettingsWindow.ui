@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>360</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>270</y>
+     <y>360</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -86,6 +86,21 @@
    <item>
     <property name="text">
      <string>Bottom Right</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Center Left</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Center Right</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Custom</string>
     </property>
    </item>
   </widget>
@@ -144,6 +159,115 @@
    </property>
    <property name="text">
     <string>Overlay Opacity</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>155</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Display Mode</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="SELECT_DisplayMode">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>180</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Speaking only</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Everyone in channel</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="LABEL_CustomX">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>245</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Custom X</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="INPUT_CustomX">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>270</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-10000</number>
+   </property>
+   <property name="maximum">
+    <number>10000</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="LABEL_CustomY">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>245</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Custom Y</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="INPUT_CustomY">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>270</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-10000</number>
+   </property>
+   <property name="maximum">
+    <number>10000</number>
    </property>
   </widget>
  </widget>

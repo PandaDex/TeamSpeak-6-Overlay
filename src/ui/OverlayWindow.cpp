@@ -2,6 +2,7 @@
 #include "./ui_OverlayWindow.h"
 #include "../network/WebsocketManager.h"
 #include "../core/ConfigManager.h"
+#include "../core/OverlayPosition.h"
 
 #ifdef Q_OS_LINUX
 #include <QGuiApplication>
@@ -21,29 +22,17 @@ OverlayWindow::OverlayWindow(QWidget *parent)
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
     auto updateAlignment = [this](const QString& position) {
-        if (position == "0") {
-            ui->verticalLayout->setAlignment(Qt::AlignTop);
-        } else if (position == "1") {
-            ui->verticalLayout->setAlignment(Qt::AlignTop | Qt::AlignRight);
-        } else if (position == "2") {
-            ui->verticalLayout->setAlignment(Qt::AlignBottom);
-        } else if (position == "3") {
-            ui->verticalLayout->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-        }
+        ui->verticalLayout->setAlignment(OverlayPosition::layoutAlignment(OverlayPosition::fromString(position)));
     };
 
     QObject::connect(ConfigManager::instance(), &ConfigManager::configChanged,
-            this, [this, updateAlignment](const QString& key, const QString& value) {
+            this, [updateAlignment](const QString& key, const QString& value) {
                 if (key == "overlayPosition") {
                     updateAlignment(value);
                 }
             });
 
-    QString position = ConfigManager::get("overlayPosition");
-    if (position.isEmpty()) {
-        position = "0";
-    }
-    updateAlignment(position);
+    updateAlignment(ConfigManager::get("overlayPosition"));
 
     // Initialize WebSocket
     WebSocketManager *wsManager = new WebSocketManager(this);

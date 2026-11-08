@@ -4,17 +4,25 @@
 #include <QObject>
 #include <QWebSocket>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPixmap>
+#include <QPointer>
+#include <QSet>
+#include <QHash>
+#include <QMap>
+#include <functional>
 #include "../ui/NewBubble.h"
 
 struct ClientInfo {
     QString id;
     QString nickname;
     QString avatarUrl;
+    QString channelId;
 };
 
 class WebSocketManager : public QObject {
@@ -24,8 +32,6 @@ public:
     explicit WebSocketManager(QWidget *overlayParent, QObject *parent = nullptr);
     static WebSocketManager* instance();
     void connectToServer();
-    bool ALG_RIGHT{};
-    bool ALG_BOTTOM{};
     void forceReconnect();
 
 private slots:
@@ -33,23 +39,50 @@ private slots:
     void onDisconnected();
     void onError(QAbstractSocket::SocketError error);
     void onTextMessageReceived(QString message);
+    void onConfigChanged(const QString &key, const QString &value);
 
 private:
-    void showSpeakingClient(const ClientInfo &client);
-    void onUserMessageReceived(const QString clientName, QString message,int id);
-    void removeSpeakingClient(const QString &clientId);
-    void scheduleReconnect();
+    void handleAuth(const QJsonObject &payload);
+    void handleTalkStatusChanged(const QJsonObject &payload);
+    void handleClientMoved(const QJsonObject &payload);
+    void handleTextMessage(const QJsonObject &payload);
+    void handleClientPropertiesUpdated(const QJsonObject &payload);
 
-    QMap<QString, NewBubble*> messageBubbles;
+    void showSpeakingClient(const ClientInfo &client);
+    void removeSpeakingClient(const QString &clientId);
+    void onUserMessageReceived(const QString &clientName, const QString &message);
+
+    // Channel list mode: rebuilds the list of clients in our current channel
+    void rebuildClientBubbles();
+    void clearClientBubbles();
+    bool isChannelMode() const;
+    bool isRightAligned() const;
+
+    void scheduleReconnect();
+    static QString idToString(const QJsonValue &value);
+    QPixmap defaultAvatar();
+
     static WebSocketManager* m_instance;
     QWebSocket socket;
+    QTimer reconnectTimer;
     QList<ClientInfo> clients;
+    QSet<QString> speakingClients;
     QString currentId;
-    int currentChannel = -1;
+    QString currentChannel;
     QWidget *overlay;
-    QMap<QString, NewBubble*> bubbles;
+    // Bubbles of clients (speaking clients, or whole channel in channel mode)
+    QMap<QString, QPointer<NewBubble>> bubbles;
     QNetworkAccessManager networkManager;
 
+    bool authenticated = false;
+    bool sentStoredApiKey = false;
+
+    // Correlates clientSelfPropertyUpdated(flagTalking) with talkStatusChanged
+    // to find our own client id when TeamSpeak sends no auth reply
+    int pendingSelfTalk = -1;
+    QElapsedTimer pendingSelfTalkTimer;
+
+    QPixmap m_defaultAvatar;
     QHash<QString, QPixmap> avatarCache;
     QSet<QString> pendingAvatarRequests;
     QHash<QString, QList<std::function<void(const QPixmap&)>>> pendingAvatarCallbacks;

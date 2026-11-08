@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(TeamSpeak-Overlay VERSION 1.0.4 LANGUAGES CXX)
+project(TeamSpeak-Overlay VERSION 1.0.5 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
         src/core/Constants.h
         src/core/ConfigManager.h
         src/core/ConfigManager.cpp
+        src/core/OverlayPosition.h
         ${TS_FILES}
 )
 

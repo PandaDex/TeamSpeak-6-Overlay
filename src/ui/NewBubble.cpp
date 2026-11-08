@@ -27,16 +27,10 @@ NewBubble::NewBubble(const QString &username, const QPixmap &avatar, const QStri
     avatarLabel->setAlignment(Qt::AlignTop);
 
     nameLabel = new QLabel(username, this);
-    nameLabel->setStyleSheet(
-        "color: white; "
-        "font-weight: bold; "
-        "padding: 4px 8px; "
-        "background-color: rgba(0, 0, 0, 102); "  // 40% opacity (255 * 0.4 = 102)
-        "border-radius: 6px;"
-    );
+    setNameStyle(NameStyle::Normal);
     nameLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    if (message != nullptr) {
+    if (!message.isEmpty()) {
         messageLabel = new QLabel(message, this);
         messageLabel->setStyleSheet(
             "color: white; "
@@ -60,7 +54,7 @@ NewBubble::NewBubble(const QString &username, const QPixmap &avatar, const QStri
     } else {
         textLayout->addWidget(nameLabel, 0, Qt::AlignLeft);
     }
-    if (message != nullptr) {
+    if (!message.isEmpty()) {
         textLayout->addWidget(messageLabel);
     }
 
@@ -77,7 +71,7 @@ NewBubble::NewBubble(const QString &username, const QPixmap &avatar, const QStri
 
         // Align username to the right
         nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        if (message != nullptr) {
+        if (!message.isEmpty()) {
             messageLabel->setAlignment(Qt::AlignTop | Qt::AlignRight);
         }
     } else {
@@ -88,7 +82,7 @@ NewBubble::NewBubble(const QString &username, const QPixmap &avatar, const QStri
 
         // Align username to the left
         nameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-        if (message != nullptr) {
+        if (!message.isEmpty()) {
             messageLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
         }
     }
@@ -102,4 +96,43 @@ NewBubble::NewBubble(const QString &username, const QPixmap &avatar, const QStri
             parentLayout->addWidget(this);
         }
     }
+}
+
+void NewBubble::setNameStyle(NameStyle style)
+{
+    // All variants keep the same total box size (border + padding) so the
+    // bubble doesn't jump when the speaking state toggles.
+    switch (style) {
+    case NameStyle::Normal:
+        nameLabel->setStyleSheet(
+            "color: white; "
+            "font-weight: bold; "
+            "padding: 4px 8px; "
+            "background-color: rgba(0, 0, 0, 102); "  // 40% opacity (255 * 0.4 = 102)
+            "border-radius: 6px;"
+        );
+        break;
+    case NameStyle::Idle:
+        nameLabel->setStyleSheet(
+            "color: rgba(255, 255, 255, 160); "
+            "font-weight: bold; "
+            "padding: 2px 6px; "
+            "border: 2px solid transparent; "
+            "background-color: rgba(0, 0, 0, 80); "
+            "border-radius: 6px;"
+        );
+        break;
+    case NameStyle::Speaking:
+        nameLabel->setStyleSheet(
+            "color: white; "
+            "font-weight: bold; "
+            "padding: 2px 6px; "
+            "border: 2px solid rgb(46, 204, 113); "
+            "background-color: rgba(0, 0, 0, 102); "
+            "border-radius: 6px;"
+        );
+        break;
+    }
+    // A disabled QLabel renders its pixmap greyed out, dimming silent clients
+    avatarLabel->setEnabled(style != NameStyle::Idle);
 }

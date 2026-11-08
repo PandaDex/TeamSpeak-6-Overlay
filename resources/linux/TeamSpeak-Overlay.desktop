@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=TeamSpeak Overlay
+Comment=Shows speaking TeamSpeak 6 clients on screen
+Exec=TeamSpeak-Overlay
+Icon=teamspeak-overlay
+Categories=Network;Chat;
+Terminal=false

@@ -17,6 +17,7 @@ signals:
     void configChanged(const QString& key, const QString& value);
 private:
     ConfigManager();
+    static void migrateLegacyConfig(const QString &configPath);
     ~ConfigManager();
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
