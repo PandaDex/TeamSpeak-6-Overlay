@@ -1,0 +1,95 @@
+name: Build Linux Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "Create a GitHub release"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-linux:
+    # Build on the oldest supported Ubuntu runner so the binary links against an
+    # old glibc (2.35). Binaries built on newer distros require e.g. GLIBC_2.38
+    # and refuse to start on Ubuntu 22.04 / Linux Mint 21.x.
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ninja-build libx11-dev libxext-dev libgl1-mesa-dev \
+            libxkbcommon-dev libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 \
+            libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libfuse2 imagemagick
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.1"
+          host: "linux"
+          target: "desktop"
+          arch: "linux_gcc_64"
+          modules: "qtwebsockets"
+          cache: "true"
+
+      - name: Configure CMake
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Prepare AppDir
+        run: |
+          DESTDIR="$PWD/AppDir" cmake --install build
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          convert resources/icon@3x.png -resize 256x256 AppDir/usr/share/icons/hicolor/256x256/apps/teamspeak-overlay.png
+
+      - name: Build AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          QMAKE: ${{ env.QT_ROOT_DIR }}/bin/qmake
+          EXTRA_PLATFORM_PLUGINS: "libqxcb.so"
+        run: |
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+          export LD_LIBRARY_PATH="${QT_ROOT_DIR}/lib:${LD_LIBRARY_PATH}"
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --executable AppDir/usr/bin/TeamSpeak-Overlay \
+            --desktop-file resources/linux/TeamSpeak-Overlay.desktop \
+            --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/teamspeak-overlay.png \
+            --plugin qt --output appimage
+          mv TeamSpeak_Overlay*.AppImage TeamSpeak-Overlay-x86_64.AppImage
+
+      - name: Check glibc requirement
+        run: |
+          echo "Highest GLIBC symbol version required by the binary:"
+          objdump -T AppDir/usr/bin/TeamSpeak-Overlay | grep -o 'GLIBC_[0-9.]*' | sort -V | tail -1
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeamSpeak-Overlay-Linux
+          path: TeamSpeak-Overlay-x86_64.AppImage
+          retention-days: 30
+
+      - name: Create Release (if requested)
+        if: ${{ github.event.inputs.create_release == 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: TeamSpeak-Overlay-x86_64.AppImage
+          draft: false
+          prerelease: false
+          tag_name: ${{ github.run_number }}-linux-build
+          name: "Linux Build ${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

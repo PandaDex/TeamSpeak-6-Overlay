@@ -22,6 +22,7 @@ protected:
 private:
     void OnSaveButtonClicked();
     void loadSettings();
+    void updateCustomPositionInputs();
     Ui::SettingsWindow *ui;
 };
 

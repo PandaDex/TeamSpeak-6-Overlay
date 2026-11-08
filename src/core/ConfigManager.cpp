@@ -4,6 +4,8 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QFileInfo>
+#include <QFile>
+#include <QCoreApplication>
 
 // Static members
 ConfigManager* ConfigManager::m_instance = nullptr;
@@ -12,21 +14,38 @@ QMutex ConfigManager::m_mutex;
 ConfigManager::ConfigManager()
     : QObject(nullptr)
 {
-    QString configPath;
-
-    QFileInfo dbInfo(Constants::DB_NAME);
-
-    if (dbInfo.isAbsolute()) {
-        configPath = dbInfo.absolutePath() + "/" + dbInfo.baseName() + ".cfg";
-    } else if (dbInfo.path() != ".") {
-        configPath = dbInfo.path() + "/" + dbInfo.baseName() + ".cfg";
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
+    if (configDir.isEmpty()) {
+        configDir = QCoreApplication::applicationDirPath();
     } else {
-        configPath = dbInfo.baseName() + ".cfg";
+        configDir += "/" + Constants::CONFIG_DIR_NAME;
     }
+    QDir().mkpath(configDir);
+    const QString configPath = QDir(configDir).filePath(Constants::CONFIG_FILE_NAME);
+
+    migrateLegacyConfig(configPath);
 
     m_settings = new QSettings(configPath, QSettings::IniFormat, this);
 
     LOG_INFO(QString("Config file initialized at: %1").arg(configPath));
+}
+
+void ConfigManager::migrateLegacyConfig(const QString &configPath)
+{
+    if (QFileInfo::exists(configPath)) return;
+
+    // Older versions stored config.cfg next to the executable / in the working dir
+    const QStringList legacyCandidates = {
+        QDir(QCoreApplication::applicationDirPath()).filePath(Constants::CONFIG_FILE_NAME),
+        QDir::current().filePath(Constants::CONFIG_FILE_NAME)
+    };
+
+    for (const QString &legacy : legacyCandidates) {
+        if (QFileInfo::exists(legacy) && QFile::copy(legacy, configPath)) {
+            LOG_INFO("Migrated legacy config from: " + legacy);
+            return;
+        }
+    }
 }
 
 ConfigManager::~ConfigManager()
@@ -52,6 +71,7 @@ ConfigManager* ConfigManager::instance()
 void ConfigManager::initialize()
 {
     ConfigManager* inst = instance();
+    QMutexLocker locker(&m_mutex);
 
     QFileInfo fileInfo(inst->m_settings->fileName());
     QDir dir = fileInfo.absoluteDir();
@@ -72,7 +92,11 @@ void ConfigManager::initialize()
         return;
     }
 
-    LOG_INFO("Config file probably ok");
+    if (!fileInfo.exists() || fileInfo.isWritable()) {
+        LOG_INFO("Config file ok: " + fileInfo.absoluteFilePath());
+    } else {
+        LOG_ERROR("Config file is not writable: " + fileInfo.absoluteFilePath());
+    }
 }
 
 QString ConfigManager::get(const QString &key)
